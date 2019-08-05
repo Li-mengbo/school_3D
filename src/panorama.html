@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>全景图</title>
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+    <!-- 启用webAPP全屏模式-->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- 隐藏状态栏或者设置状态栏的颜色-->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!-- 禁止缓存访问页面-->
+    <meta http-equiv="Pragma" content="no-cache">
+    <!-- 页面关键词-->
+    <meta name="applicable-device" content="mobile">
+    <script src="http://47.92.118.208:8081/js/photo-sphere-viewer.min.js"></script>
+    <script src="http://47.92.118.208:8081/js/three.min.js"></script>
+</head>
+
+<body>
+    <div class="head">
+        <a class="return" href="./index.html">
+            <img src="${require('./static/img/jiantou.png')}" alt="">
+        </a>
+        <span>退出全景</span>
+    </div>
+    <div id="panorama"></div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>北京财贸职业学院</title>
+  <script>
+    (function (doc, win) {
+        var docEl = doc.documentElement,
+        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+        recalc = function () {
+            var clientWidth = docEl.clientWidth;
+            if (!clientWidth) return;
+            if(clientWidth>=640){
+                docEl.style.fontSize = '100px';
+            }else{
+                docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
+            }
+            };
+        if (!doc.addEventListener) return;
+        win.addEventListener(resizeEvt, recalc, false);
+        doc.addEventListener('DOMContentLoaded', recalc, false);    
+    })(document, window);
+    </script> 
+</head>
+<body>
+  <div class="periphery">
+    <div class="head">
+      <a class="return" href="./index.html">
+        <img src="${require('./static/img/jiantou.png')}" alt="">
+      </a>
+      <span>发现周边</span>
+    </div>
+    <ul class="nav">
+    </ul>
+    <ul class="title">
+    </ul>
+  </div>
+</body>
+</html>

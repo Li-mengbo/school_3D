@@ -1,0 +1,140 @@
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>北京财贸职业学院</title>
+    <script>
+    (function (doc, win) {
+        var docEl = doc.documentElement,
+        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+        recalc = function () {
+            var clientWidth = docEl.clientWidth;
+            if (!clientWidth) return;
+            if(clientWidth>=640){
+                docEl.style.fontSize = '100px';
+            }else{
+                docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
+            }
+            };
+        if (!doc.addEventListener) return;
+        win.addEventListener(resizeEvt, recalc, false);
+        doc.addEventListener('DOMContentLoaded', recalc, false);    
+    })(document, window);
+    </script> 
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=35d07dbc5cf281a1bcfe8eb168b815c8&plugin=AMap.PolyEditor"></script>
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=35d07dbc5cf281a1bcfe8eb168b815c8&plugin=AMap.Walking"></script>
+    <script src="http://a.amap.com/jsapi_demos/static/demo-center/model/js/three.js"></script>
+    <script src="http://a.amap.com/jsapi_demos/static/demo-center/model/js/Detector.js"></script>
+    <script src="http://a.amap.com/jsapi_demos/static/demo-center/model/js/controls/OrbitControls.js"></script>
+    <script src="http://a.amap.com/jsapi_demos/static/demo-center/model/js/loaders/GLTFLoader.js"></script>
+    <script src="http://47.92.118.208:8081/js/FirstPersonControls.js"></script>
+</head>
+<body>
+    <div id="container">
+        <div id="mapBox"></div>
+        <div id="three"></div>
+        <div class="serach">
+            <input type="text" placeholder="输入地点查询">
+            <img class="find"  src="${require('./static/img/find.png')}" alt="">
+            <button class="search-btn">搜索</button>
+            <ul class="search-list" style="display: none;">
+ 
+            </ul>
+        </div>
+        <ul class="menu">
+            <li class="school">
+                <a href="./school.html">
+                    <img src="${require('./static/img/school.png')}" alt="">
+                </a>
+                <span>学校</span>
+            </li>
+            <li class="panorama">
+                <a href="./panoramaContainer.html">
+                    <img src="${require('./static/img/photo.png')}" alt="">
+                </a>
+                <span>全景</span>
+            </li>
+        </ul>
+        <div class="footer">
+            <a class="periphery" href="./periphery.html">
+                <img  src="${require('./static/img/round.png')}" alt="">
+                <span>发现周边</span>
+            </a>
+            <a class="luxian" href="./route.html">
+                <img  src="${require('./static/img/luxian.png')}" alt="">
+            </a>
+            <div class="service">
+                <img class="" src="${require('./static/img/service.png')}" alt="">
+                <span>服务中心</span>
+            </div>
+        </div>
+        <div class="head" style="display: none;">
+            <a class="return" href="./index.html">
+                <img src="${require('./static/img/jiantou.png')}" alt="">
+            </a>
+            <span>退出导航</span>
+        </div>
+        <div class="distance" style="display: none;">
+            <p class="title">
+            </p>
+            <p class="daohang">
+                <img src="${require('./static/img/walk.png')}" alt="">
+                <span>到这去</span>
+            </p>
+        </div>
+        <div class="nearby" style="display: none;">
+
+        </div>
+        <div class="service-container" style="display: none">
+        </div>
+        <div class="container" style="display: none">
+            <img src="" alt="">
+            <ul class="nav">
+                <li class="item renwu">
+                    <img src="${require('./static/img/renwushijiao.jpg')}" alt="">
+                    <span>人物视角</span>
+                </li>
+                <li class="item pingmian">
+                    <img src="${require('./static/img/weixingtu.jpg')}" alt="">
+                    <span>平面图</span>
+                </li>
+                <li class="item 3D">
+                    <img src="${require('./static/img/3D.jpg')}" alt="">
+                    <span>3D视角</span>
+                </li>
+                <li class="item">
+                    <a href="./roam.html">
+                        <img src="${require('./static/img/manyou.jpg')}" alt="">
+                        <span>漫游</span>
+                    </a>
+                </li>
+            </ul> 
+            <div class="activity-con">
+                <div class="activity" data-flag="true" data-index="0">
+                    <p class="activity-title">活动查询</p>
+                    <div class="open">
+                    </div>
+                </div> 
+                <div class="activity" data-flag="true" data-index="1">
+                    <p class="activity-title">校庆专题</p>
+                    <div class="open">
+                    </div>
+                </div>
+                <div class="activity" data-flag="true" data-index="2">
+                    <p class="activity-title">迎新专题</p>
+                    <div class="open">
+                    </div>                    
+                </div>
+                <div class="activity" data-flag="true" data-index="3">
+                        <p class="activity-title">关于</p>
+                        <div class="open">
+                        </div>                    
+                </div>                   
+            </div>                                                            
+        </div>     
+    </div>
+</body>
+</html>

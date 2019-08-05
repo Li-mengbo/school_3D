@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>北京财贸职业学院</title>
+    <script>
+        (function (doc, win) {
+            var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+                var clientWidth = docEl.clientWidth;
+                if (!clientWidth) return;
+                if(clientWidth>=640){
+                    docEl.style.fontSize = '100px';
+                }else{
+                    docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
+                }
+                };
+            if (!doc.addEventListener) return;
+            win.addEventListener(resizeEvt, recalc, false);
+            doc.addEventListener('DOMContentLoaded', recalc, false);    
+        })(document, window);
+    </script>  
+</head>
+<body>
+    <div class="panorama-container">
+        <div class="head">
+                <a class="return" href="./index.html">
+                    <img src="${require('./static/img/jiantou.png')}" alt="">
+                </a>
+                <span>全景</span>
+        </div>
+        <div class="panorama-tab">
+            <ul class="nav">
+                <li class="item" data-index="0">
+                    <img src="${require('./static/img/outside.png')}" alt="">
+                    <span>室外</span>
+                </li>
+                <li class="item" data-index="1">
+                    <img src="${require('./static/img/side.png')}" alt="">
+                    <span>室内</span>
+                </li>
+            </ul>   
+            <div class="abroad">
+            </div>
+            <div class="abroad" style="display: none;">
+
+            </div>                                               
+        </div>         
+    </div>
+</body>
+</html>
