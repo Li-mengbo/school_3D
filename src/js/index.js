@@ -64,7 +64,7 @@ function initCamera() {
     */
    console.log(controlsFlag)
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
-    if(controlsFlag == 'pingmian') {
+    if(controlsFlag == 'pingmian' || controlsFlag == 'manyou') {
         // alert(1)
         // 默认相机坐标
         camera.position.set(0, 45, 0)
@@ -94,7 +94,7 @@ function initLight() {
 /* 控制器 */
 function initControls() {
     console.log(controlsFlag)
-    if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
+    if(controlsFlag == 'pingmian' || controlsFlag == '3d'  || controlsFlag == 'manyou') {
         // alert(1)
         controls = new THREE.OrbitControls(camera, renderer.domElement);
     }else if(controlsFlag == 'renwu') {
@@ -135,37 +135,28 @@ function initContent() {
 
 }
 
-/* 设置中心显示坐标轴 红色为x 蓝色为z */
-function axes() {
-    // var axes = new THREE.AxisHelper(10);
-    // scene1.add(axes);
-    //定义材质THREE.LineBasicMaterial . MeshBasicMaterial...都可以
-    var material = new THREE.LineBasicMaterial({color:0x0000ff});
-    // 空几何体，里面没有点的信息,不想BoxGeometry已经有一系列点，组成方形了。
-    // var geometry = new THREE.Geometry();
+function manyouPath(startLon, startLat, endLon,endLat) {
     curve = new THREE.CatmullRomCurve3();
     //步行导航
     var walking = new AMap.Walking({
         map: map
     }); 
     //根据起终点坐标规划步行路线
-    walking.search([116.64861023,39.92165992], [116.646901,39.919333], function(status, result) {
+    walking.search([startLon, startLat], [endLon, endLat], function(status, result) {
         // result即是对应的步行路线数据信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkingResult
         if (status === 'complete') {
-            console.log(result.routes[0].steps)
+            console.log(11111, result.routes[0])
             const steps = result.routes[0].steps;
-            steps.forEach((item, index) => {
+            steps.forEach((item) => {
                 let arr = [];
                 if(item.path) {
-                    item.path.forEach((items, index) => {
+                    item.path.forEach((items) => {
                         const x = CalculationX(items.lng);
                         const z = CalculationZ(items.lat);
                         arr.push([-x, -z])
                     })
                 }
                 stepsList.push(arr)
-                // arr.push(item.end_location.lat)
-                // arr.push(item.end_location.lng)
             });
             const uuidArr = unid(stepsList);
             const erweiArr = erwei(uuidArr); 
@@ -174,7 +165,7 @@ function axes() {
                 // geometry.vertices.push(new THREE.Vector3(-item[0],0,-item[1]));
                 curve.points.push(new THREE.Vector3(-item[0], 0, -item[1]))
             })
-            curve.points.push(new THREE.Vector3(CalculationX(116.646901), 0, CalculationZ(39.919333)))
+            curve.points.push(new THREE.Vector3(CalculationX(endLon), 0, CalculationZ(endLat)))
             var tubeGeometry = new THREE.TubeGeometry(curve, 70, 0.05, 10, false);
             var textureLoader = new THREE.TextureLoader();
             var texture = textureLoader.load('http://47.92.118.208:8081/01.png');
@@ -188,14 +179,74 @@ function axes() {
                 transparent: true,
             });
             var tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
-            scene.add(tube)
-            // geometry.vertices.push(new THREE.Vector3(x,0,z));
+            scene.add(tube) 
+        } else {
+            console.log('失败')
+            // log.error('步行路线数据查询失败' + result)
+        } 
+    });
+}
+
+/* 设置中心显示坐标轴 红色为x 蓝色为z */
+function axes(startLon, startLat, endLon,endLat) {
+    //定义材质THREE.LineBasicMaterial . MeshBasicMaterial...都可以
+    var material = new THREE.LineBasicMaterial({color:0x0000ff});
+    // 空几何体，里面没有点的信息,不想BoxGeometry已经有一系列点，组成方形了。
+    var geometry = new THREE.Geometry();
+    curve = new THREE.CatmullRomCurve3();
+    //步行导航
+    var walking = new AMap.Walking({
+        map: map
+    }); 
+    //根据起终点坐标规划步行路线
+    walking.search([startLon, startLat], [endLon, endLat], function(status, result) {
+        // result即是对应的步行路线数据信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkingResult
+        if (status === 'complete') {
+            console.log(11111, result.routes[0])
+            const steps = result.routes[0].steps;
+            steps.forEach((item) => {
+                let arr = [];
+                if(item.path) {
+                    item.path.forEach((items) => {
+                        const x = CalculationX(items.lng);
+                        const z = CalculationZ(items.lat);
+                        arr.push([-x, -z])
+                    })
+                }
+                stepsList.push(arr)
+            });
+            const uuidArr = unid(stepsList);
+            const erweiArr = erwei(uuidArr); 
+            erweiArr.forEach(item => {
+                // 给空白几何体添加点信息，这里写3个点，geometry会把这些点自动组合成线，面。
+                geometry.vertices.push(new THREE.Vector3(-item[0],0,-item[1]));
+                // curve.points.push(new THREE.Vector3(-item[0], 0, -item[1]))
+            })
+            
+            // curve.points.push(new THREE.Vector3(CalculationX(endLon), 0, CalculationZ(endLat)))
+            // var tubeGeometry = new THREE.TubeGeometry(curve, 70, 0.05, 10, false);
+            // var textureLoader = new THREE.TextureLoader();
+            // var texture = textureLoader.load('http://47.92.118.208:8081/01.png');
+            // texture.wrapS = THREE.RepeatWrapping
+            // texture.wrapT=THREE.RepeatWrapping
+            /**
+             * 设置x方向的偏移(沿着管道路径方向)，y方向默认1
+             * 等价texture.repeat= new THREE.Vector2(20,1)
+            */
+            // texture.repeat.x = 20;
+            // var tubeMaterial = new THREE.MeshPhongMaterial({
+            //     map: texture,
+            //     transparent: true,
+            // });
+            // var tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+            // scene.add(tube)
+
+            geometry.vertices.push(new THREE.Vector3(CalculationX(endLon), 0, CalculationZ(endLat)));
             
             //线构造
-            // var line=new THREE.Line(geometry,material);
+            var line=new THREE.Line(geometry,material);
             // 加入到场景中
-            // scene1.add(line);  
-            // log.success('绘制步行路线完成')
+            scene.add(line);  
         } else {
             console.log('失败')
             // log.error('步行路线数据查询失败' + result)
@@ -214,8 +265,6 @@ function onWindowResize() {
 
 /* 加载导航箭头图片 */
 function loadImg() {
-    //模型大门的坐标为(x=-0.1,z=16.5,116.64861023,39.92165992)
-    // 116.647605,39.919496
     // 需要改为定位获取
     const x = CalculationX(116.64856);
     const z = CalculationZ(39.921263);
@@ -232,12 +281,10 @@ function loadImg() {
     scene.add(mesh);
 }
 
-function loadEndImg() {
-    //模型大门的坐标为(x=-0.1,z=16.5,116.64861023,39.92165992)
-    // 116.647605,39.919496
+function loadEndImg(x, z, fn) {
     // 需要改为定位获取
-    clickX = CalculationX(116.646901);
-    clickZ = CalculationZ(39.919333);
+    clickX = CalculationX(x);
+    clickZ = CalculationZ(z);
     var skyBoxGeometry = new THREE.CubeGeometry(); 
     var texture = new THREE.TextureLoader().load('http://47.92.118.208:8081/01.png');
     var material = new THREE.MeshBasicMaterial({
@@ -247,10 +294,8 @@ function loadEndImg() {
     meshEnd.position.y = 2;
     meshEnd.position.x = clickX;
     meshEnd.position.z = clickZ;
-    // mesh.rotation.x = -1.5;
-    // mesh.rotation.y = -1.5;
-    // mesh.rotation.z = 1.57 * 4;
     scene.add(meshEnd);
+    window.addEventListener( 'click', onMouseClick.bind(window, clickX, clickZ, fn), false );
 }
 
 /**封装点击事件 */
@@ -258,7 +303,13 @@ function loadEndImg() {
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 
-function onMouseClick( event ) {
+/**
+ * x 坐标x位置
+ * z 坐标z位置
+ * fn 点击执行的回调
+ * event 点击事件参数
+ */
+function onMouseClick(x, z, fn, event ) {
 
     //通过鼠标点击的位置计算出raycaster所需要的点的位置，以屏幕中心为原点，值的范围为-1到1.
 
@@ -271,20 +322,19 @@ function onMouseClick( event ) {
     // 获取raycaster直线和所有模型相交的数组集合
     const intersects = raycaster.intersectObjects( scene.children );
     if(intersects[0]) {
-        const clicksX = Math.floor(clickX);
-        const clicksZ = Math.floor(clickZ);
+        // console.log(intersects[0].point.x, intersects[0].point.z)
+        const clicksX = Math.floor(x);
+        const clicksZ = Math.floor(z);
         const intersectsX = Math.floor(intersects[0].point.x);
         const intersectsZ = Math.floor(intersects[0].point.z);
         // console.log(clicksX, clicksZ);
         // console.log(intersectsX, intersectsZ)
         // console.log(clicksX - intersectsX < 1, clicksZ - intersectsZ < 1)
-        if( clicksX - intersectsX < 1 &&  clicksZ - intersectsZ < 1) {
-            alert('点击了')
+        if( clicksX == intersectsX && clicksZ == intersectsZ) {
+            fn();
         }
     }
 }
-
-window.addEventListener( 'click', onMouseClick, false );
 
 /*加载终点图标*/
 
@@ -298,10 +348,10 @@ function init() {
     initLight();
     initControls();
     loadImg();
-    loadEndImg();
     initContent();
-    // initGui();
-    axes();
+    if(controlsFlag == 'manyou') {
+        manyouPath(116.64861023,39.92165992, 116.646901, 39.919333)
+    }
     /* 监听事件 */
 
     window.addEventListener('resize', onWindowResize, false);
@@ -313,17 +363,19 @@ var clock = new THREE.Clock();
 function animate() {
     controls.update(clock.getDelta());
     requestAnimationFrame(animate);
-    if(progress>1.0){
-        return;    //停留在管道末端,否则会一直跑到起点 循环再跑
+    if(controlsFlag == 'manyou') {
+        if(progress>1.0){
+            return;    //停留在管道末端,否则会一直跑到起点 循环再跑
+        }
+        // 相机漫游模式
+        if (curve.points.length > 0) {
+            progress += 0.0009;
+            let point = curve.getPoint(progress);
+            if (point&&point.x) {
+                mesh.position.set(point.x,point.y,point.z);
+            }
+        }
     }
-    // 相机漫游模式
-    // if (curve.points.length > 0) {
-    //     progress += 0.0009;
-    //     let point = curve.getPoint(progress);
-    //     if (point&&point.x) {
-    //         mesh.position.set(point.x,point.y,point.z);
-    //     }
-    // }
     renderer.render(scene, camera);
 
 }
@@ -376,27 +428,14 @@ if (center) {
                        title: provinces[i].name,
                        map: map
                    });
-                   var markerContent = document.createElement("div");
+                   // var markerContent = document.createElement("div");
                    if(provinces[i].center == center) {
-                        map.setCenter(provinces[i].center.split(','));
-                        // 点标记中的图标
-                        var markerImg = document.createElement("img");
-                        // markerImg.attr('data-type' , 'false');  
-                        markerImg.className = "markerlnglat";
-                        markerImg.src = "http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png";
-                        markerContent.appendChild(markerImg);
-                       // 点标记中的文本
-                       var markerSpan = document.createElement("span");
-                       markerSpan.className = 'marker';
-                       markerSpan.innerHTML = provinces[i].name;
-                       markerContent.append(markerSpan);
+                        const position =provinces[i].center.split(',');
+                       // console.log(3333, provinces[i].center.split(','))
+                        loadEndImg(position[0], position[1], function() {
+                            window.location.href = './panorama.html?imgurl=' + provinces[i].imgUrl
+                        });
                    }
-                   // markerImg.src = "http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png";
-                   
-                   marker.on('click', function(e) {
-                       window.location.href = './panorama.html?imgurl=' + provinces[i].imgUrl
-                   })
-                   marker.setContent(markerContent); //更新点标记内容
                }
                markers.push(marker);
                // map.add(marker);
@@ -422,18 +461,27 @@ $('.search-btn').click(function() {
             $('.panorama').hide();
             const name = $(this).html();
             const position = $(this).attr('data-position').split(',');
-            map.setCenter(position);
-            map.clearMap();
-            const marker = new AMap.Marker({
-                position,
-                offset: new AMap.Pixel(-10, -10),
-                icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
-                map: map
-            });
-            marker.on('click', function(e) {
+            var allChildren = scene.children;
+            var lastObject = allChildren[allChildren.length-1];
+            if(lastObject instanceof THREE.Mesh){
+                scene.remove(lastObject);
+            }
+            loadEndImg(position[0], position[1], function() {
                 $('.serach').hide();
-                walk([116.648432,39.92166], position, name, false)
-            })
+                axes(116.64861023,39.92165992, position[0], position[1])
+            });
+            // map.setCenter(position);
+            // map.clearMap();
+            // const marker = new AMap.Marker({
+            //     position,
+            //     offset: new AMap.Pixel(-10, -10),
+            //     icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+            //     map: map
+            // });
+            // marker.on('click', function(e) {
+            //     $('.serach').hide();
+            //     walk([116.648432,39.92166], position, name, false)
+            // })
         })
     }else {
         $('.search-list').append('<li>没有查到</li>')
@@ -444,6 +492,7 @@ $('.search-btn').click(function() {
     })
 })
 
+
 // 附近跳转
 if (nearby) {
     $('.head').show().find('span').html('发现周边');
@@ -451,51 +500,63 @@ if (nearby) {
     $('.school').hide();
     $('.panorama').hide();
     $('.serach').hide();
-    // 获取周边详细信息
-    $.ajax({ 
-        url: `http://47.92.118.208/school-map/circum/getByTypeId?typeId=${nearby}`, 
-        success: function(res){
-            console.log('周边详细信息',res)
-            if(res.code == 200) {
-                const zhoubian = res.data;
-                zhoubian.forEach(item => {
-                    $('.nearby').append(
-                        `
-                        <div class="nearby-con">
-                            <div class="nearby-details" data-position="${item.content}">
-                                <img src="${item.imgUrl}" alt="">
-                                <div class="left">
-                                    <span class="left-title">${item.name}</span>
-                                    <span>
-                                        ${item.description}
-                                    </span>
-                                </div>
-                            </div>
+    /* 异步方法 */
+    function runAsync(){
+        return new Promise(function(resolve, reject){
+            // 获取周边详细信息
+            $.ajax({ 
+                url: `http://47.92.118.208/school-map/circum/getByTypeId?typeId=${nearby}`, 
+                success: function(res){
+                    console.log('周边详细信息',res)
+                    if(res.code == 200) {
+                        const zhoubian = res.data;
+                        resolve(zhoubian);
+                    }
+                }
+            });
+        });        
+    }
+    runAsync().then(function(zhoubian) {
+        zhoubian.forEach(item => {
+            $('.nearby').append(
+                `
+                <div class="nearby-con">
+                    <div class="nearby-details" data-position="${item.content}">
+                        <img src="${item.imgUrl}" alt="">
+                        <div class="left">
+                            <span class="left-title">${item.name}</span>
+                            <span>
+                                ${item.description}
+                            </span>
                         </div>
-                        `
-                    )
-                    $('.nearby-details').click(function () {
-                        $('.nearby').hide();
-                        $('.footer').hide();
-                        const name = $(this).find('.left-title').html();
-                        const position = $(this).attr('data-position').split(',');
-                        endPosition = position;
-                        map.setCenter(position);
-                        const marker = new AMap.Marker({
-                            position,
-                            offset: new AMap.Pixel(-10, -10),
-                            icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
-                            map: map
-                        });
-                        marker.on('click', function(e) {
-                            console.log(position)
-                            walk([116.648432,39.92166], position, name, false)
-                        })
-                    })
-                })
-            }
-        }
-    });
+                    </div>
+                </div>
+                `
+            )
+        })
+    }).then( function() {
+        $('.nearby-details').click(function () {
+            $('.nearby').hide();
+            $('.footer').hide();
+            const name = $(this).find('.left-title').html();
+            const position = $(this).attr('data-position').split(',');
+            loadEndImg(position[0], position[1], function() {
+                axes(116.64861023,39.92165992, position[0], position[1])
+            });
+            // endPosition = position;
+            // map.setCenter(position);
+            // const marker = new AMap.Marker({
+            //     position,
+            //     offset: new AMap.Pixel(-10, -10),
+            //     icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+            //     map: map
+            // });
+            // marker.on('click', function(e) {
+            //     console.log(position)
+            //     walk([116.648432,39.92166], position, name, false)
+            // })
+        })
+    })
     $('.nearby').show();
 }
 
@@ -505,18 +566,22 @@ if (position) {
     $('.footer').hide();
     $('.head').show().find('span').html('主页面');
     const positions = position.split(',');
-    map.setCenter(positions);
-    map.clearMap();
-    const marker = new AMap.Marker({
-        position: positions,
-        offset: new AMap.Pixel(-10, -10),
-        icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
-        map: map
+    loadEndImg(positions[0], positions[1], function() {
+        $('.serach').hide();
+        axes(116.64861023,39.92165992, positions[0], positions[1])
     });
-    marker.on('click', function(e) {
-        console.log(positions)
-        walk([116.648432,39.92166], positions, name, false)
-    })
+    // map.setCenter(positions);
+    // map.clearMap();
+    // const marker = new AMap.Marker({
+    //     position: positions,
+    //     offset: new AMap.Pixel(-10, -10),
+    //     icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+    //     map: map
+    // });
+    // marker.on('click', function(e) {
+    //     console.log(positions)
+    //     walk([116.648432,39.92166], positions, name, false)
+    // })
 }
 
 // 路线导航 
@@ -527,12 +592,14 @@ if(startCenter && endCenter) {
     $('.head').show().find('span').html('主页面');
     const startCenterArr = startCenter.split(',');
     const endCenterArr = endCenter.split(',');
+    loadEndImg(endCenterArr[0], endCenterArr[1])
+    axes(startCenterArr[0],startCenterArr[1], endCenterArr[0], endCenterArr[1])
     // new AMap.Marker({
     //     position: startCenterArr,
     //     icon: 'https://webapi.amap.com/theme/v1.3/markers/n/start.png',
     //     map: map
     // })
-    walk(startCenterArr, endCenterArr, name, true, false)
+    // walk(startCenterArr, endCenterArr, name, true, false)
     // setInterval(() => {
     //     geolocation();
     //     walk(initCenter, endCenterArr, name, true, true);
@@ -796,12 +863,12 @@ $(".activity-title").click(function() {
 // 导航
 $('.daohang').click(function () {
     $('.distance').hide()
-    geolocation();
-    walk(initCenter, endPosition, name, true, true);
-    setInterval(() => {
-        geolocation();
-        walk(initCenter, endPosition, name, true, true);
-    }, 3000);
+    // geolocation();
+    // walk(initCenter, endPosition, name, true, true);
+    // setInterval(() => {
+    //     geolocation();
+    //     walk(initCenter, endPosition, name, true, true);
+    // }, 3000);
 })
 // 视角切换
 $('.3D').click(function () {
@@ -812,4 +879,7 @@ $('.pingmian').click(function () {
 })
 $('.renwu').click(function() {
     window.location.href = './index.html?controlsFlag=renwu';
+})
+$('.manyou').click(function() {
+    window.location.href = './index.html?controlsFlag=manyou';
 })
