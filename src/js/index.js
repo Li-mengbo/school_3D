@@ -44,8 +44,6 @@ let endPosition = [];
 /* 初始坐标在北门 */
 x = CalculationX(116.64861023);
 z = CalculationZ(39.92165992);
-console.log(CalculationX(116.646901))
-console.log(CalculationZ(39.919333))
 // 默认为地三人称相机
 controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 
@@ -62,13 +60,12 @@ function initCamera() {
     * 近端渲染
     * 远端剪切平面可以看到多远
     */
-   console.log(controlsFlag)
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
-    if(controlsFlag == 'pingmian' || controlsFlag == 'manyou') {
+    if(controlsFlag == 'pingmian') {
         // alert(1)
         // 默认相机坐标
         camera.position.set(0, 45, 0)
-    }else if(controlsFlag == 'renwu') {
+    }else if(controlsFlag == 'renwu' || controlsFlag == 'manyou') {
         // 修改相机坐标
         camera.position.set(x, .2, z)
     }else if(controlsFlag == '3d') {
@@ -94,15 +91,23 @@ function initLight() {
 /* 控制器 */
 function initControls() {
     console.log(controlsFlag)
-    if(controlsFlag == 'pingmian' || controlsFlag == '3d'  || controlsFlag == 'manyou') {
+    if(controlsFlag == 'pingmian') {
+        controls = new THREE.OrbitControlsTwo(camera, renderer.domElement);
+    }else if(controlsFlag == '3d') {
         // alert(1)
         controls = new THREE.OrbitControls(camera, renderer.domElement);
-    }else if(controlsFlag == 'renwu') {
+        // 控制3D视角角度
+        controls.maxPolarAngle = 1.4;
+        controls.minPolarAngle = 0.5;
+    }else if(controlsFlag == 'renwu' || controlsFlag == 'manyou') {
         // 第一人称相机控制器
         controls = new THREE.FirstPersonControls(camera, renderer.domElement);
-        controls.movementSpeed = 300; //相机移动速度
+        controls.actualLookSpeed = 300; //相机移动速度
         controls.noFly = true;
         controls.constrainVertical = true; //约束垂直
+        // 控制第一人称上下视角角度
+        controls.verticalMin = 1.0;
+        controls.verticalMax = 2.0;
         controls.lat = 0; //初始视角进入后y轴的角度
         controls.lon = 90;
     }
@@ -145,7 +150,6 @@ function manyouPath(startLon, startLat, endLon,endLat) {
     walking.search([startLon, startLat], [endLon, endLat], function(status, result) {
         // result即是对应的步行路线数据信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkingResult
         if (status === 'complete') {
-            console.log(11111, result.routes[0])
             const steps = result.routes[0].steps;
             steps.forEach((item) => {
                 let arr = [];
@@ -166,20 +170,20 @@ function manyouPath(startLon, startLat, endLon,endLat) {
                 curve.points.push(new THREE.Vector3(-item[0], 0, -item[1]))
             })
             curve.points.push(new THREE.Vector3(CalculationX(endLon), 0, CalculationZ(endLat)))
-            var tubeGeometry = new THREE.TubeGeometry(curve, 70, 0.05, 10, false);
-            var textureLoader = new THREE.TextureLoader();
-            var texture = textureLoader.load('http://47.92.118.208:8081/01.png');
-            texture.wrapS = THREE.RepeatWrapping
-            texture.wrapT=THREE.RepeatWrapping
-            // 设置x方向的偏移(沿着管道路径方向)，y方向默认1
-            //等价texture.repeat= new THREE.Vector2(20,1)
-            texture.repeat.x = 20;
-            var tubeMaterial = new THREE.MeshPhongMaterial({
-                map: texture,
-                transparent: true,
-            });
-            var tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
-            scene.add(tube) 
+            // var tubeGeometry = new THREE.TubeGeometry(curve, 0, 0, 0, false);
+            // var textureLoader = new THREE.TextureLoader();
+            // var texture = textureLoader.load('http://47.92.118.208:8081/01.png');
+            // texture.wrapS = THREE.RepeatWrapping
+            // texture.wrapT=THREE.RepeatWrapping
+            // // 设置x方向的偏移(沿着管道路径方向)，y方向默认1
+            // //等价texture.repeat= new THREE.Vector2(20,1)
+            // texture.repeat.x = 20;
+            // var tubeMaterial = new THREE.MeshPhongMaterial({
+            //     map: texture,
+            //     transparent: true,
+            // });
+            // var tube = new THREE.Mesh(tubeGeometry);
+            // scene.add(tube) 
         } else {
             console.log('失败')
             // log.error('步行路线数据查询失败' + result)
@@ -202,7 +206,6 @@ function axes(startLon, startLat, endLon,endLat) {
     walking.search([startLon, startLat], [endLon, endLat], function(status, result) {
         // result即是对应的步行路线数据信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkingResult
         if (status === 'complete') {
-            console.log(11111, result.routes[0])
             const steps = result.routes[0].steps;
             steps.forEach((item) => {
                 let arr = [];
@@ -322,14 +325,10 @@ function onMouseClick(x, z, fn, event ) {
     // 获取raycaster直线和所有模型相交的数组集合
     const intersects = raycaster.intersectObjects( scene.children );
     if(intersects[0]) {
-        // console.log(intersects[0].point.x, intersects[0].point.z)
         const clicksX = Math.floor(x);
         const clicksZ = Math.floor(z);
         const intersectsX = Math.floor(intersects[0].point.x);
         const intersectsZ = Math.floor(intersects[0].point.z);
-        // console.log(clicksX, clicksZ);
-        // console.log(intersectsX, intersectsZ)
-        // console.log(clicksX - intersectsX < 1, clicksZ - intersectsZ < 1)
         if( clicksX == intersectsX && clicksZ == intersectsZ) {
             fn();
         }
@@ -353,7 +352,6 @@ function init() {
         manyouPath(116.64861023,39.92165992, 116.646901, 39.919333)
     }
     /* 监听事件 */
-
     window.addEventListener('resize', onWindowResize, false);
 
 }
@@ -369,9 +367,10 @@ function animate() {
         }
         // 相机漫游模式
         if (curve.points.length > 0) {
-            progress += 0.0009;
-            let point = curve.getPoint(progress);
-            if (point&&point.x) {
+            progress += 0.0001;
+            let point = curve.getPointAt(progress);
+            if ( point && point.x ) {
+                camera.position.set(point.x,point.y,point.z)
                 mesh.position.set(point.x,point.y,point.z);
             }
         }
@@ -741,14 +740,12 @@ $(".activity-title").click(function() {
     $.ajax({ 
         url: `http://47.92.118.208/school-map/serviceInfo/getByType?type=${index}`, 
         success: function(res){
-            console.log('校园服务中心',res)
             if(res.code == 200) {
                 const schoolList = res.data;
                 $('.open:eq('+ index +')').html('')
                 schoolList.forEach((item, ind) => {
                     let str = '';
                     if( item.positions.length > 1 ) {
-                        console.log(item);
                         item.positions.forEach(items => {
                             str += `
                             <div class="place" data-center="${items.center}">
@@ -883,3 +880,19 @@ $('.renwu').click(function() {
 $('.manyou').click(function() {
     window.location.href = './index.html?controlsFlag=manyou';
 })
+try {  
+    var text = "";  
+    window.addEventListener("deviceorientation", orientationHandler, false);  
+    function orientationHandler(event) {  
+        text = ""  
+        var arrow = document.getElementById("arrow");  
+        text += "左右旋转：rotate alpha{" + Math.round(event.alpha) + "deg)<br>";  
+        text += "前后旋转：rotate beta{" + Math.round(event.beta) + "deg)<br>";  
+        text += "扭转设备：rotate gamma{" + Math.round(event.gamma) + "deg)<br>";  
+        arrow.innerHTML = text;  
+        mesh.rotation.z = Math.round(event.alpha+f90) * 6 / 360;
+    }  
+}  
+catch (e) {  
+    document.getElementById("arrow").innerHTML(e.message)  
+}

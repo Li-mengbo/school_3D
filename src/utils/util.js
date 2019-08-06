@@ -62,5 +62,16 @@ export function erwei(baseArray) {
       let temp = baseArray.slice(i*n, i*n+n);
       res.push(temp);
   }
-  return res;
+  console.log(res)
+  return res.reduce((function () {
+      var map = {};
+      return function (result, next) {
+          var key = next[0];
+          if (!map[key]) {
+          map[key] = true;
+          result.push(next);
+          }
+          return result;
+      };
+  })(), []);
 }
