@@ -119,7 +119,7 @@ function initContent() {
     // 加载 glTF 格式的模型
     let loader = new THREE.GLTFLoader(); /*实例化加载器*/
 
-    loader.load('http://47.92.118.208:8081/7311/7311.gltf', function (obj) {
+    loader.load('http://47.92.118.208:8081/school8.7/school8.7.gltf', function (obj) {
         console.log(obj)
         // 修改位置坐标
         obj.scene.position.y = 0;
@@ -192,7 +192,7 @@ function manyouPath(startLon, startLat, endLon,endLat) {
 }
 
 /* 设置中心显示坐标轴 红色为x 蓝色为z */
-function axes(startLon, startLat, endLon,endLat) {
+function axes(startLon, startLat, endLon,endLat, fn) {
     //定义材质THREE.LineBasicMaterial . MeshBasicMaterial...都可以
     var material = new THREE.LineBasicMaterial({color:0x0000ff});
     // 空几何体，里面没有点的信息,不想BoxGeometry已经有一系列点，组成方形了。
@@ -250,6 +250,9 @@ function axes(startLon, startLat, endLon,endLat) {
             var line=new THREE.Line(geometry,material);
             // 加入到场景中
             scene.add(line);  
+            if (fn) {
+                fn(result)
+            }
         } else {
             console.log('失败')
             // log.error('步行路线数据查询失败' + result)
@@ -402,7 +405,7 @@ $.ajax({
     }
 });
 
-/* 高德地图逻辑 */
+/* 以下是地图逻辑 */
 
 /* 全景图展示 */
 if (center) {
@@ -465,9 +468,18 @@ $('.search-btn').click(function() {
             if(lastObject instanceof THREE.Mesh){
                 scene.remove(lastObject);
             }
+            console.log('name', name);
+            $('.title').html('');
+            $('.title').append(`<span>${name}</span>`)
             loadEndImg(position[0], position[1], function() {
                 $('.serach').hide();
-                axes(116.64861023,39.92165992, position[0], position[1])
+                // drawRoute(result.routes[0])
+                axes(116.64861023,39.92165992, position[0], position[1], function(result) {
+                    $('.distance').show();
+                    $('.head').show().find('span').html('退出导航');
+                    $('.title').append(`
+                    <span>${result.routes[0].distance}.${Math.ceil(Math.random()*10)}米</span>`)
+                })
             });
             // map.setCenter(position);
             // map.clearMap();
@@ -718,7 +730,7 @@ function geolocation () {
     });
 }
 function onComplete(data) {
-    initCenter = data.position.split(',');
+    // initCenter = data.position.split(',');
 }
 //解析定位错误信息
 function onError(data) {
@@ -862,10 +874,13 @@ $('.daohang').click(function () {
     $('.distance').hide()
     // geolocation();
     // walk(initCenter, endPosition, name, true, true);
-    // setInterval(() => {
-    //     geolocation();
-    //     walk(initCenter, endPosition, name, true, true);
-    // }, 3000);
+    setInterval(() => {
+        // geolocation();
+        const x = CalculationX(116.64761);
+        const z = CalculationZ(39.921372);
+        mesh.position.x = x;
+        mesh.position.z = z;
+    }, 3000);
 })
 // 视角切换
 $('.3D').click(function () {
@@ -880,19 +895,15 @@ $('.renwu').click(function() {
 $('.manyou').click(function() {
     window.location.href = './index.html?controlsFlag=manyou';
 })
-try {  
-    var text = "";  
-    window.addEventListener("deviceorientation", orientationHandler, false);  
-    function orientationHandler(event) {  
-        text = ""  
-        var arrow = document.getElementById("arrow");  
-        text += "左右旋转：rotate alpha{" + Math.round(event.alpha) + "deg)<br>";  
-        text += "前后旋转：rotate beta{" + Math.round(event.beta) + "deg)<br>";  
-        text += "扭转设备：rotate gamma{" + Math.round(event.gamma) + "deg)<br>";  
-        arrow.innerHTML = text;  
-        mesh.rotation.z = Math.round(event.alpha+f90) * 6 / 360;
-    }  
+/* 获取陀螺仪 */
+// var text = "";  
+window.addEventListener("deviceorientation", orientationHandler, false);  
+function orientationHandler(event) {  
+    // text = ""  
+    // var arrow = document.getElementById("arrow");  
+    // text += "左右旋转：rotate alpha{" + Math.round(event.alpha) + "deg)<br>";  
+    // text += "前后旋转：rotate beta{" + Math.round(event.beta) + "deg)<br>";  
+    // text += "扭转设备：rotate gamma{" + Math.round(event.gamma) + "deg)<br>";  
+    // arrow.innerHTML = text;  
+    mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
 }  
-catch (e) {  
-    document.getElementById("arrow").innerHTML(e.message)  
-}
