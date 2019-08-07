@@ -24,14 +24,14 @@ export function fuzzyQuery(list, keyWord) {
   *@param longitude
   *@return 基于模型的X坐标点
   *说明：
-  *模型大门的坐标为(x=-0.1,z=16.5,116.64861023,39.92165992)
-  *模型财贸大楼会议楼坐标为(x=40.2，z=-8.7，116.64481759,39.91972215)
+  *模型大门的坐标为(x=13,z=-15,116.64861023,39.92165992)
+  *模型会议楼坐标为(x=-27，z=11，116.64481759,39.91972215)
   */
         
  export function CalculationX(x) {
-  const a = (-0.1 - 40.2) / (116.64861023 - 116.64481759);
-  const b = (-0.1 - 116.64861023 * a);
-  return -(a * x + b);
+  const a = ( 12.7 - -25) / (116.64861023 - 116.64494634);            
+  const b = ( 12.7 - 116.64861023 * a);   
+  return a * x + b;
 }
 
 /*传入纬度,返回基于模型的Z坐标点
@@ -39,9 +39,9 @@ export function fuzzyQuery(list, keyWord) {
   *@return 基于模型的Z坐标点
   */
  export function CalculationZ(z) {
-    const a = (16.5 - -8.7) / (39.92165992 - 39.91972215);
-    const b = (16.5 - 39.92165992 * a);
-    return -(a * z + b);
+    const a = (-14.8 - 11.6) / (39.92165992 - 39.91972215);            
+    const b = (-14.8 - 39.92165992 * a);
+    return a * z + b;
 }
 /* 多维数组转换成一维数组*/
 export function unid(arr){

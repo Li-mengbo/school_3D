@@ -67,7 +67,7 @@ function initCamera() {
         camera.position.set(0, 45, 0)
     }else if(controlsFlag == 'renwu' || controlsFlag == 'manyou') {
         // 修改相机坐标
-        camera.position.set(x, .2, z)
+        camera.position.set(x, .18, z)
     }else if(controlsFlag == '3d') {
         camera.position.set(30, 20, 30)
     }
@@ -93,6 +93,9 @@ function initControls() {
     console.log(controlsFlag)
     if(controlsFlag == 'pingmian') {
         controls = new THREE.OrbitControlsTwo(camera, renderer.domElement);
+        // 控制拖动角度
+        // controls.maxAzimuthAngle = 1.4;
+        // controls.minAzimuthAngle = .5;
     }else if(controlsFlag == '3d') {
         // alert(1)
         controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -140,6 +143,7 @@ function initContent() {
 
 }
 
+/* 设置漫游路线 */
 function manyouPath(startLon, startLat, endLon,endLat) {
     curve = new THREE.CatmullRomCurve3();
     //步行导航
@@ -157,7 +161,7 @@ function manyouPath(startLon, startLat, endLon,endLat) {
                     item.path.forEach((items) => {
                         const x = CalculationX(items.lng);
                         const z = CalculationZ(items.lat);
-                        arr.push([-x, -z])
+                        arr.push([x, z])
                     })
                 }
                 stepsList.push(arr)
@@ -167,7 +171,7 @@ function manyouPath(startLon, startLat, endLon,endLat) {
             erweiArr.forEach(item => {
                 // 给空白几何体添加点信息，这里写3个点，geometry会把这些点自动组合成线，面。
                 // geometry.vertices.push(new THREE.Vector3(-item[0],0,-item[1]));
-                curve.points.push(new THREE.Vector3(-item[0], 0, -item[1]))
+                curve.points.push(new THREE.Vector3(item[0], 0, item[1]))
             })
             curve.points.push(new THREE.Vector3(CalculationX(endLon), 0, CalculationZ(endLat)))
             // var tubeGeometry = new THREE.TubeGeometry(curve, 0, 0, 0, false);
@@ -191,7 +195,7 @@ function manyouPath(startLon, startLat, endLon,endLat) {
     });
 }
 
-/* 设置中心显示坐标轴 红色为x 蓝色为z */
+/* 设置导航路线 */
 function axes(startLon, startLat, endLon,endLat, fn) {
     //定义材质THREE.LineBasicMaterial . MeshBasicMaterial...都可以
     var material = new THREE.LineBasicMaterial({color:0x0000ff});
@@ -222,29 +226,11 @@ function axes(startLon, startLat, endLon,endLat, fn) {
             const erweiArr = erwei(uuidArr); 
             erweiArr.forEach(item => {
                 // 给空白几何体添加点信息，这里写3个点，geometry会把这些点自动组合成线，面。
-                geometry.vertices.push(new THREE.Vector3(-item[0],0,-item[1]));
-                // curve.points.push(new THREE.Vector3(-item[0], 0, -item[1]))
+                geometry.vertices.push(new THREE.Vector3(-item[0], .2, -item[1]));
             })
             
-            // curve.points.push(new THREE.Vector3(CalculationX(endLon), 0, CalculationZ(endLat)))
-            // var tubeGeometry = new THREE.TubeGeometry(curve, 70, 0.05, 10, false);
-            // var textureLoader = new THREE.TextureLoader();
-            // var texture = textureLoader.load('http://47.92.118.208:8081/01.png');
-            // texture.wrapS = THREE.RepeatWrapping
-            // texture.wrapT=THREE.RepeatWrapping
-            /**
-             * 设置x方向的偏移(沿着管道路径方向)，y方向默认1
-             * 等价texture.repeat= new THREE.Vector2(20,1)
-            */
-            // texture.repeat.x = 20;
-            // var tubeMaterial = new THREE.MeshPhongMaterial({
-            //     map: texture,
-            //     transparent: true,
-            // });
-            // var tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
-            // scene.add(tube)
 
-            geometry.vertices.push(new THREE.Vector3(CalculationX(endLon), 0, CalculationZ(endLat)));
+            geometry.vertices.push(new THREE.Vector3(CalculationX(endLon), .2, CalculationZ(endLat)));
             
             //线构造
             var line=new THREE.Line(geometry,material);
@@ -268,22 +254,26 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 
 }
-
 /* 加载导航箭头图片 */
 function loadImg() {
+    // var axes = new THREE.AxisHelper(10);
+    // scene.add(axes);
     // 需要改为定位获取
     const x = CalculationX(116.64856);
     const z = CalculationZ(39.921263);
+    console.log(x, z)
     var skyBoxGeometry = new THREE.PlaneGeometry(); 
     var texture = new THREE.TextureLoader().load('http://47.92.118.208:8081/01.png');
     var material = new THREE.MeshBasicMaterial({
-            map: texture
+            map: texture,
+            transparent: true
     });
     mesh = new THREE.Mesh(skyBoxGeometry, material);
-    mesh.position.y = 0;
+    mesh.position.y = 0.5;
     mesh.position.x = x;
     mesh.position.z = z;
-    mesh.rotation.x = -1.5;
+    mesh.rotation.x += -0.5 * Math.PI;
+    mesh.rotation.z += 1.5 * Math.PI;
     scene.add(mesh);
 }
 
@@ -349,7 +339,9 @@ function init() {
     initCamera();
     initLight();
     initControls();
-    loadImg();
+    if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
+        loadImg();
+    }
     initContent();
     if(controlsFlag == 'manyou') {
         manyouPath(116.64861023,39.92165992, 116.646901, 39.919333)
@@ -373,8 +365,8 @@ function animate() {
             progress += 0.0001;
             let point = curve.getPointAt(progress);
             if ( point && point.x ) {
-                camera.position.set(point.x,point.y,point.z)
-                mesh.position.set(point.x,point.y,point.z);
+                camera.position.set(point.x, .18, point.z)
+                // mesh.position.set(point.x,poin2t.y,point.z);
             }
         }
     }
@@ -905,5 +897,6 @@ function orientationHandler(event) {
     // text += "前后旋转：rotate beta{" + Math.round(event.beta) + "deg)<br>";  
     // text += "扭转设备：rotate gamma{" + Math.round(event.gamma) + "deg)<br>";  
     // arrow.innerHTML = text;  
-    mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
+    mesh.rotation.z = (event.alpha + 90)/180*Math.PI;
+    // mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
 }  
