@@ -1,6 +1,7 @@
 import '../style/index';
 import '../style/style';
 import { GetQueryString, fuzzyQuery, CalculationX, CalculationZ, unid, erwei } from '../utils/util';
+import loadGltf from '../utils/loadGltf';
 import $ from 'jquery';
 /* 地图路线绘制 */
 const map = new AMap.Map("mapBox", {
@@ -118,24 +119,25 @@ function initContent() {
 
     // 加载 glTF 格式的模型
     let loader = new THREE.GLTFLoader(); /*实例化加载器*/
-
-    loader.load('http://47.92.118.208:8081/school8.7/school8.7.gltf', function (obj) {
-        console.log(obj)
-        // 修改位置坐标
-        obj.scene.position.y = 0;
-        obj.scene.position.x = 0;
-        obj.scene.position.z = 0;
-        scene.add(obj.scene);
-        // document.getElementById('loading').style.display = 'none';
-
-    }, function (xhr) {
-
-        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-
-    }, function (error) {
-
-        console.log('load error!' + error.getWebGLErrorMessage());
-
+    loadGltf.forEach(item => {
+        loader.load(`http://47.92.118.208:8081/school/${item.name}/${item.name}.gltf`, function (obj) {
+            console.log(obj)
+            // 修改位置坐标
+            obj.scene.position.y = 0;
+            obj.scene.position.x = 0;
+            obj.scene.position.z = 0;
+            scene.add(obj.scene);
+            // document.getElementById('loading').style.display = 'none';
+    
+        }, function (xhr) {
+    
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    
+        }, function (error) {
+    
+            console.log('load error!' + error.getWebGLErrorMessage());
+    
+        })
     })
 
 }
