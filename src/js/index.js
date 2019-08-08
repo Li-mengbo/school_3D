@@ -29,8 +29,9 @@ const map = new AMap.Map("mapBox", {
     * startCenter 导航起点
     * endCenter 导航终点
     * position 校园风光位置
+    * meshBg 地图底图
 */
-let scene, camera, renderer, controls, mesh, meshEnd, curve, progress=0, x, z, controlsFlag, stepsList = [], clickX, clickZ;
+let scene, camera, renderer, controls, mesh, meshEnd, curve, progress=0, x, z, controlsFlag, stepsList = [], clickX, clickZ, meshBg;
 
 const center = GetQueryString('center');
 const nearby = GetQueryString('nearby');
@@ -143,6 +144,25 @@ function initContent() {
         })
     })
 
+}
+
+/* 地图底图 */
+function initBg() {
+    var skyBoxGeometry = new THREE.PlaneGeometry(72, 80, 1); 
+    for(let i = 1, n = 5; i <= 5; i++) {
+        var texture = new THREE.TextureLoader().load(`http://47.92.118.208:8081/schoolatlas/map0${i}.png`);
+        var material = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true
+        });
+        meshBg = new THREE.Mesh(skyBoxGeometry, material);
+        meshBg.position.y = 0;
+        meshBg.position.x = 0;
+        meshBg.position.z = 0;
+        meshBg.rotation.x += -0.5 * Math.PI;
+        scene.add(meshBg);
+        
+    }
 }
 
 /* 设置漫游路线 */
@@ -275,7 +295,7 @@ function loadImg() {
     mesh.position.x = x;
     mesh.position.z = z;
     mesh.rotation.x += -0.5 * Math.PI;
-    mesh.rotation.z += 1.5 * Math.PI;
+    mesh.rotation.z += -1 * Math.PI;
     scene.add(mesh);
 }
 
@@ -284,9 +304,10 @@ function loadEndImg(x, z, fn) {
     clickX = CalculationX(x);
     clickZ = CalculationZ(z);
     var skyBoxGeometry = new THREE.CubeGeometry(); 
-    var texture = new THREE.TextureLoader().load('http://47.92.118.208:8081/01.png');
+    var texture = new THREE.TextureLoader().load('http://47.92.118.208:8081/End.png');
     var material = new THREE.MeshBasicMaterial({
-        map: texture
+        map: texture,
+        transparent: true
     });
     meshEnd = new THREE.Mesh(skyBoxGeometry, material);
     meshEnd.position.y = 2;
@@ -319,6 +340,7 @@ function onMouseClick(x, z, fn, event ) {
 
     // 获取raycaster直线和所有模型相交的数组集合
     const intersects = raycaster.intersectObjects( scene.children );
+    // console.log(2222, intersects)
     if(intersects[0]) {
         const clicksX = Math.floor(x);
         const clicksZ = Math.floor(z);
@@ -345,6 +367,7 @@ function init() {
         loadImg();
     }
     initContent();
+    initBg();
     if(controlsFlag == 'manyou') {
         manyouPath(116.64861023,39.92165992, 116.646901, 39.919333)
     }
@@ -463,15 +486,15 @@ $('.search-btn').click(function() {
                 scene.remove(lastObject);
             }
             console.log('name', name);
-            $('.title').html('');
-            $('.title').append(`<span>${name}</span>`)
             loadEndImg(position[0], position[1], function() {
                 $('.serach').hide();
                 // drawRoute(result.routes[0])
                 axes(116.64861023,39.92165992, position[0], position[1], function(result) {
                     $('.distance').show();
                     $('.head').show().find('span').html('退出导航');
+                    $('.title').html('');
                     $('.title').append(`
+                    <span>${name}</span>
                     <span>${result.routes[0].distance}.${Math.ceil(Math.random()*10)}米</span>`)
                 })
             });
