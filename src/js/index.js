@@ -71,7 +71,7 @@ function initCamera() {
         // 修改相机坐标
         camera.position.set(x, .18, z)
     }else if(controlsFlag == '3d') {
-        camera.position.set(30, 20, 30)
+        camera.position.set(30, 10, 30)
     }
 }
 
@@ -148,7 +148,7 @@ function initContent() {
 
 /* 地图底图 */
 function initBg() {
-    var skyBoxGeometry = new THREE.PlaneGeometry(72, 80, 1); 
+    var skyBoxGeometry = new THREE.PlaneGeometry(82, 35.5, 1); 
     for(let i = 1, n = 5; i <= 5; i++) {
         var texture = new THREE.TextureLoader().load(`http://47.92.118.208:8081/schoolatlas/map0${i}.png`);
         var material = new THREE.MeshBasicMaterial({
@@ -163,6 +163,17 @@ function initBg() {
         scene.add(meshBg);
         
     }
+    // var texture = new THREE.TextureLoader().load(`http://47.92.118.208:8081/bg.png`);
+    // var material = new THREE.MeshBasicMaterial({
+    //     map: texture,
+    //     transparent: true
+    // });
+    // meshBg = new THREE.Mesh(skyBoxGeometry, material);
+    // meshBg.position.y = 0;
+    // meshBg.position.x = 1.6;
+    // meshBg.position.z = -.5;
+    // meshBg.rotation.x += -0.5 * Math.PI;
+    // scene.add(meshBg);
 }
 
 /* 设置漫游路线 */
@@ -215,6 +226,63 @@ function manyouPath(startLon, startLat, endLon,endLat) {
             // log.error('步行路线数据查询失败' + result)
         } 
     });
+}
+
+/* 生成网格 */
+var length = 1200;
+function initGround() {
+	var geometry = new THREE.Geometry();
+	geometry.vertices.push(new THREE.Vector3(-length / 32, 0, 0));
+	geometry.vertices.push(new THREE.Vector3(length / 32, 0, 0));
+
+	//播放动画请注释一下内容			
+	for(var i = 0; i <= length / 10; i++) {
+        console.log((i * 10) - length / 2)
+
+		var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+			color: 0x808080,
+			opacity: 1
+		}));
+		line.position.z = (i * 10 / 16) - length / 32;
+		scene.add(line);
+
+		var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+			color: 0x808080,
+			opacity: 1
+		}));
+		line.position.x = (i * 10 / 16) - length / 32;
+		line.rotation.y = 90 * Math.PI / 180;
+		scene.add(line);
+
+	}
+	//播放动画请注释以上内容
+	// var geometry = new THREE.PlaneGeometry(length, 10);
+	// var material = new THREE.MeshBasicMaterial({
+	// 	color: 0x808080,
+	// 	side: THREE.DoubleSide
+	// });
+	// var plane = new THREE.Mesh(geometry, material);
+	// plane.position.set(0, 5, length / 2);
+	// scene.add(plane);
+	// var plane = new THREE.Mesh(geometry, material);
+	// plane.rotation.y = 90 * Math.PI / 180;
+	// plane.position.set(length / 2, 5, 0);
+	// scene.add(plane);
+	// var plane = new THREE.Mesh(geometry, material);
+	// plane.position.set(0, 5, -length / 2);
+	// scene.add(plane);
+	// var plane = new THREE.Mesh(geometry, material);
+	// plane.rotation.y = 90 * Math.PI / 180;
+	// plane.position.set(-length / 2, 5, 0);
+	// scene.add(plane);
+	var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
+	var skyBoxMaterial = new THREE.MeshBasicMaterial({
+		color: 0xFFFFFF,
+		side: THREE.BackSide
+	});
+	var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
+	scene.add(skyBox);
+
 }
 
 /* 设置导航路线 */
@@ -368,6 +436,7 @@ function init() {
     }
     initContent();
     initBg();
+    initGround();
     if(controlsFlag == 'manyou') {
         manyouPath(116.64861023,39.92165992, 116.646901, 39.919333)
     }
