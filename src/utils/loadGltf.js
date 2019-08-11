@@ -127,15 +127,6 @@ const gltf = [
       }
   }, 
   {
-      name: 'tree',
-      paramCity: {
-          position: new AMap.LngLat(116.647224,39.920403), // 必须
-          scale: 70, // 非必须，默认1
-          height: 0,  // 非必须，默认0
-          scene: 0, // 非必须，默认0
-      }
-  },
-  {
       name: 'tushuguan',
       paramCity: {
           position: new AMap.LngLat(116.647226,39.920474), // 必须
@@ -163,7 +154,7 @@ const gltf = [
       }
   }, 
   {
-      name: 'xuesheng01',
+      name: 'xuesheng03',
       paramCity: {
           position: new AMap.LngLat(116.647278,39.921155), // 必须
           scale: 70, // 非必须，默认1
@@ -172,7 +163,7 @@ const gltf = [
       }
   },
   {
-      name: 'xuesheng02',
+      name: 'xuesheng04',
       paramCity: {
           position: new AMap.LngLat(116.647186,39.921155), // 必须
           scale: 70, // 非必须，默认1
@@ -215,7 +206,223 @@ const gltf = [
           height: 0,  // 非必须，默认0
           scene: 0, // 非必须，默认0
       }
+  },
+  {
+    name: 'lanqiuchang',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+    name: 'beimenzuo',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+    name: 'guojijiaoliupang',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+    name: 'lianhuakantai',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+    name: 'light',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+    name: 'qiaoer',
+    paramCity: {
+        position: new AMap.LngLat(116.647169,39.920417), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+},
+{
+    name: 'qiaosan',
+    paramCity: {
+        position: new AMap.LngLat(116.647267,39.9205), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+}, 
+{
+    name: 'qiaoyi',
+    paramCity: {
+        position: new AMap.LngLat(116.647378,39.920336), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+}, 
+{
+    name: 'shangyuan',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+},
+{
+  name: 'shifang',
+  paramCity: {
+      position: new AMap.LngLat(116.647265,39.920376), // 必须
+      scale: 70, // 非必须，默认1
+      height: 0,  // 非必须，默认0
+      scene: 0, // 非必须，默认0
   }
+},
+{
+  name: 'shuita',
+  paramCity: {
+      position: new AMap.LngLat(116.647265,39.920376), // 必须
+      scale: 70, // 非必须，默认1
+      height: 0,  // 非必须，默认0
+      scene: 0, // 非必须，默认0
+  }
+},
+{
+  name: 'weimingming',
+  paramCity: {
+      position: new AMap.LngLat(116.647265,39.920376), // 必须
+      scale: 70, // 非必须，默认1
+      height: 0,  // 非必须，默认0
+      scene: 0, // 非必须，默认0
+  }
+},
+{
+  name: 'weimingmingpang',
+  paramCity: {
+      position: new AMap.LngLat(116.647265,39.920376), // 必须
+      scale: 70, // 非必须，默认1
+      height: 0,  // 非必须，默认0
+      scene: 0, // 非必须，默认0
+  }
+},
+{
+  name: 'zuoer',
+  paramCity: {
+      position: new AMap.LngLat(116.647265,39.920376), // 必须
+      scale: 70, // 非必须，默认1
+      height: 0,  // 非必须，默认0
+      scene: 0, // 非必须，默认0
+  }
+},
+{
+    name: 'zuoyi',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+    name: 'weiqiang01',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+    name: 'weiqiang02',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+    name: 'weiqiang03',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+    name: 'weiqiang04',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+    name: 'weiqiang05',
+    paramCity: {
+        position: new AMap.LngLat(116.647265,39.920376), // 必须
+        scale: 70, // 非必须，默认1
+        height: 0,  // 非必须，默认0
+        scene: 0, // 非必须，默认0
+    }
+  },
+  {
+      name: 'weiqiang06',
+      paramCity: {
+          position: new AMap.LngLat(116.647265,39.920376), // 必须
+          scale: 70, // 非必须，默认1
+          height: 0,  // 非必须，默认0
+          scene: 0, // 非必须，默认0
+      }
+    },
+    {
+        name: 'tree',
+        paramCity: {
+            position: new AMap.LngLat(116.647265,39.920376), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+        }
+    }  
+//   {
+//     name: 'untitled',
+//     paramCity: {
+//         position: new AMap.LngLat(116.647265,39.920376), // 必须
+//         scale: 70, // 非必须，默认1
+//         height: 0,  // 非必须，默认0
+//         scene: 0, // 非必须，默认0
+//     }
+//   },
+//   {
+//     name: 'untitled01',
+//     paramCity: {
+//         position: new AMap.LngLat(116.647265,39.920376), // 必须
+//         scale: 70, // 非必须，默认1
+//         height: 0,  // 非必须，默认0
+//         scene: 0, // 非必须，默认0
+//     }
+//   }               
 ]
 
 export default gltf;
