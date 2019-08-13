@@ -71,9 +71,14 @@ function initCamera() {
         // alert(1)
         // 默认相机坐标
         camera.position.set(0, 45, 0)
-    }else if(controlsFlag == 'renwu' || controlsFlag == 'manyou') {
+    }else if(controlsFlag == 'renwu') {
+        geolocation();
         // 修改相机坐标
-        camera.position.set(startPathX, .18, startPathX)
+        camera.position.set(startPathX, .18, startPathZ);
+    }else if(controlsFlag == 'manyou') {
+        const manyouPathX = CalculationX(116.64861023);
+        const manyouPathZ = CalculationZ(39.92165992);
+        camera.position.set(manyouPathX, .18, manyouPathZ);
     }else if(controlsFlag == '3d') {
         camera.position.set(30, 0, 30)
     }
@@ -433,7 +438,7 @@ function initGrid() {
 /* 设置导航路线 */
 function axes(startLon, startLat, endLon,endLat, fn) {
     //定义材质THREE.LineBasicMaterial . MeshBasicMaterial...都可以
-    var material = new THREE.LineBasicMaterial({color:0xff6804, linewidth: 100});
+    var material = new THREE.LineBasicMaterial({color:0xff6804, linewidth: 500});
     // 空几何体，里面没有点的信息,不想BoxGeometry已经有一系列点，组成方形了。
     var geometry = new THREE.Geometry();
     var maps = new Graph(arrJson);
@@ -964,9 +969,11 @@ function geolocation () {
     });
 }
 function onComplete(data) {
-    initCenter = data.position.split(',');
-    startPathX = initCenter[0];
-    startPathZ = initCenter[1];
+    if(data.position) {
+        initCenter = data.position.split(',');
+        startPathX = initCenter[0];
+        startPathZ = initCenter[1];
+    }
 }
 //解析定位错误信息
 function onError(data) {
@@ -1095,12 +1102,13 @@ $('.daohang').click(function () {
     $('.distance').hide()
     // geolocation();
     // walk(initCenter, endPosition, name, true, true);
+    geolocation();
     setInterval(() => {
-        // geolocation();
-        const x = CalculationX(116.64761);
-        const z = CalculationZ(39.921372);
-        mesh.position.x = x;
-        mesh.position.z = z;
+        geolocation();
+        // const x = CalculationX(116.64761);
+        // const z = CalculationZ(39.921372);
+        mesh.position.x = startPathX;
+        mesh.position.z = startPathZ;
     }, 3000);
 })
 // 视角切换
