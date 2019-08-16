@@ -524,6 +524,7 @@ function loadImg() {
     scene.add(axes);
     */
     // 需要改为定位获取
+    geolocation();
     const x = CalculationX(startPathX);
     const z = CalculationZ(startPathZ);
     console.log(x, z)
@@ -951,7 +952,7 @@ function geolocation () {
     map.plugin('AMap.Geolocation', function () {
         var geolocation = new AMap.Geolocation({
             enableHighAccuracy: true,//是否使用高精度定位，默认:true
-            timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+            timeout: 100000,          //超过10秒后停止定位，默认：无穷大
             maximumAge: 0,           //定位结果缓存0毫秒，默认：0
             convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
             showButton: true,        //显示定位按钮，默认：true
@@ -973,10 +974,13 @@ function onComplete(data) {
         initCenter = data.position.split(',');
         startPathX = initCenter[0];
         startPathZ = initCenter[1];
+        alert(startPathX, startPathZ)
+        document.getElementById('weizhi').innerHTML = '您的位置：'+initCenter[0]+',<br/>'+initCenter[1]; 
     }
 }
 //解析定位错误信息
 function onError(data) {
+    alert(JSON.stringify(data))
     console.log(data)
 }
 $(".service").click(function(){
