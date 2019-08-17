@@ -33,10 +33,6 @@ const map = new AMap.Map("mapBox", {
     * meshBg 地图底图
 */
 let scene, camera, renderer, controls, mesh, meshEnd, curve, progress=0, startPathX, startPathZ, controlsFlag, stepsList = [], clickX, clickZ, meshBg;
-//切图在scene中的大小
-const tileSize = 50;
-//地图切片服务地址
-var serverURL = "http://c.tile.osm.org/";
 const center = GetQueryString('center');
 const nearby = GetQueryString('nearby');
 const startCenter = GetQueryString('startCenter');
@@ -46,7 +42,6 @@ const position = GetQueryString('position');
 let initCenter = [116.648432,39.92166];
 //导航结束值
 let endPosition = [];
-
 /* 初始坐标在北门 */
 startPathX = CalculationX(116.64861023);
 startPathZ = CalculationZ(39.92165992);
@@ -72,9 +67,9 @@ function initCamera() {
         // 默认相机坐标
         camera.position.set(0, 45, 0)
     }else if(controlsFlag == 'renwu') {
-        geolocation();
         // 修改相机坐标
         camera.position.set(startPathX, .18, startPathZ);
+        geolocation();
     }else if(controlsFlag == 'manyou') {
         const manyouPathX = CalculationX(116.64861023);
         const manyouPathZ = CalculationZ(39.92165992);
@@ -152,38 +147,6 @@ function initControls() {
     }
 }
 
-/* 加载天空盒子 */
-function makeSkybox() {
-    scene.background = new THREE.CubeTextureLoader()
-    .setPath("http://47.92.118.208:8081/skybox/")
-    .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png', ]);
-    //这部分是给出图片的位置及图片名
-    // var imagePrefix = "http://47.92.118.208:8081/skybox/";
-    // var directions  = ["px", "nx", "py", "ny", "pz", "nz"];//获取对象
-    // var imageSuffix = ".png";
-
-    // //创建一个立方体并且设置大小
-    // var skyGeometry = new THREE.CubeGeometry( 100, 30, 50 );
-    // //这里是用于天空盒六个面储存多个材质的数组
-    // var materialArray = [];
-    // //循环将图片加载出来变成纹理之后将这个物体加入数组中
-    // for (var i = 0; i < 6; i++)
-    //     materialArray.push( new THREE.MeshBasicMaterial({
-    //         //这里imagePrefix + directions[i] + imageSuffix 就是将图片路径弄出来
-    //         map: new THREE.TextureLoader().load( imagePrefix + directions[i] + imageSuffix ),
-    //         side: THREE.BackSide  //因为这里我们的场景是在天空盒的里面，所以这里设置为背面应用该材质
-    //     }));
-
-    // //MultiMaterial可以将MeshBasicMaterial多个加载然后直接通过Mesh生成物体
-    // var skyMaterial = new THREE.MultiMaterial( materialArray );
-    // //加入形状skyGeometry和材质MultiMaterial
-    // var sky = new THREE.Mesh( skyGeometry, skyMaterial );
-    // //设置天空盒的高度
-    // sky.position.y = 0;
-    // //场景当中加入天空盒
-    // scene.add( sky );
-}
-
 /* 场景中的内容加载gltf格式也可以换成其他格式*/
 function initContent() {
 
@@ -217,7 +180,7 @@ function initContent() {
 function initBg() {
     var skyBoxGeometry1 = new THREE.PlaneGeometry(78, 39, 1); 
     for(let i = 1, n = 5; i <= 5; i++) {
-        var texture = new THREE.TextureLoader().load(`http://47.92.118.208:8081/schoolatlas/0${i}.png`);
+        var texture = new THREE.TextureLoader().load(require(`../static/schoolatlas/0${i}.png`));
         var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
@@ -231,7 +194,7 @@ function initBg() {
     }
     var skyBoxGeometry2 = new THREE.PlaneGeometry(111, 55, 1); 
     for(let i = 1, n = 5; i <= 5; i++) {
-        var texture = new THREE.TextureLoader().load(`http://47.92.118.208:8081/schoolatlas/m0${i}.png`);
+        var texture = new THREE.TextureLoader().load(require(`../static/schoolatlas/m0${i}.png`));
         var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
@@ -243,6 +206,35 @@ function initBg() {
         meshBg.rotation.x += -0.5 * Math.PI;
         scene.add(meshBg);
     }    
+}
+
+/* 加载天空盒子 */
+function makeSkybox() {
+    // scene.background = new THREE.CubeTextureLoader()
+    // .setPath("http://47.92.118.208:8081/skybox/")
+    // .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png', ]);
+    //这部分是给出图片的位置及图片名
+    var directions  = ["px", "nx", "py", "ny", "pz", "nz"];//获取对象
+    //创建一个立方体并且设置大小
+    var skyGeometry = new THREE.CubeGeometry( 100, 30, 50 );
+    //这里是用于天空盒六个面储存多个材质的数组
+    var materialArray = [];
+    //循环将图片加载出来变成纹理之后将这个物体加入数组中
+    for (var i = 0; i < 6; i++)
+        materialArray.push( new THREE.MeshBasicMaterial({
+            //这里imagePrefix + directions[i] + imageSuffix 就是将图片路径弄出来
+            map: new THREE.TextureLoader().load( require(`../static/skybox/${directions[i]}.png`) ),
+            side: THREE.BackSide  //因为这里我们的场景是在天空盒的里面，所以这里设置为背面应用该材质
+        }));
+
+    //MultiMaterial可以将MeshBasicMaterial多个加载然后直接通过Mesh生成物体
+    var skyMaterial = new THREE.MultiMaterial( materialArray );
+    //加入形状skyGeometry和材质MultiMaterial
+    var sky = new THREE.Mesh( skyGeometry, skyMaterial );
+    //设置天空盒的高度
+    sky.position.y = 0;
+    //场景当中加入天空盒
+    scene.add( sky );
 }
 
 /** 
@@ -524,12 +516,11 @@ function loadImg() {
     scene.add(axes);
     */
     // 需要改为定位获取
-    geolocation();
     const x = CalculationX(startPathX);
     const z = CalculationZ(startPathZ);
     console.log(x, z)
     var skyBoxGeometry = new THREE.PlaneGeometry(); 
-    var texture = new THREE.TextureLoader().load('http://47.92.118.208:8081/01.png');
+    var texture = new THREE.TextureLoader().load(require(`../static/img/01.png`));
     var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
@@ -541,6 +532,7 @@ function loadImg() {
     mesh.rotation.x += -0.5 * Math.PI;
     mesh.rotation.z += -1 * Math.PI;
     scene.add(mesh);
+    geolocation();
 }
 
 /*加载起点图标*/
@@ -549,7 +541,7 @@ function loadStartImg(x, z) {
     clickX = CalculationX(x);
     clickZ = CalculationZ(z);
     var skyBoxGeometry = new THREE.CubeGeometry(); 
-    var texture = new THREE.TextureLoader().load('http://47.92.118.208:8081/Start.png');
+    var texture = new THREE.TextureLoader().load(require(`../static/img/Start.png`));
     var material = new THREE.MeshBasicMaterial({
         map: texture,
         transparent: true
@@ -567,7 +559,7 @@ function loadEndImg(x, z, fn) {
     clickX = CalculationX(x);
     clickZ = CalculationZ(z);
     var skyBoxGeometry = new THREE.CubeGeometry(); 
-    var texture = new THREE.TextureLoader().load('http://47.92.118.208:8081/End.png');
+    var texture = new THREE.TextureLoader().load(require(`../static/img/End1.png`));
     var material = new THREE.MeshBasicMaterial({
         map: texture,
         transparent: true
@@ -971,11 +963,26 @@ function geolocation () {
 }
 function onComplete(data) {
     if(data.position) {
-        initCenter = data.position.split(',');
-        startPathX = initCenter[0];
-        startPathZ = initCenter[1];
-        alert(startPathX, startPathZ)
-        document.getElementById('weizhi').innerHTML = '您的位置：'+initCenter[0]+',<br/>'+initCenter[1]; 
+        const initPosition = JSON.parse(JSON.stringify(data.position));
+        startPathX = initPosition.lng;
+        startPathZ = initPosition.lat;
+        var str = [];
+        str.push('定位结果：' + data.position);
+        str.push('定位类别：' + data.location_type);
+        if(data.accuracy){
+             str.push('精度：' + data.accuracy + ' 米');
+        }//如为IP精确定位结果则没有精度信息
+        str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
+        document.getElementById('weizhi').innerHTML =  str.join('<br>') + '您的位置：'+startPathX+',<br/>'+startPathZ +'<br/>' +CalculationX(startPathX)+'<br/>' +CalculationZ(startPathZ);
+        if(controlsFlag == 'pingmian') {
+            // const x = CalculationX(116.64761);
+            // const z = CalculationZ(39.921372);
+            mesh.position.x = CalculationX(startPathX);
+            mesh.position.z = CalculationZ(startPathZ);
+        }
+        if(controlsFlag == 'renwu') {
+            camera.position.set(CalculationX(startPathX), .18, CalculationZ(startPathZ))
+        } 
     }
 }
 //解析定位错误信息
@@ -1111,8 +1118,8 @@ $('.daohang').click(function () {
         geolocation();
         // const x = CalculationX(116.64761);
         // const z = CalculationZ(39.921372);
-        mesh.position.x = startPathX;
-        mesh.position.z = startPathZ;
+        // mesh.position.x = startPathX;
+        // mesh.position.z = startPathZ;
     }, 3000);
 })
 // 视角切换
