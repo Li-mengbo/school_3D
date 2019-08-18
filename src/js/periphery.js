@@ -3,7 +3,7 @@ import '../style/periphery';
 import $ from 'jquery';
 // 获取模糊查询信息
 $.ajax({ 
-    url: "http://47.92.118.208/school-map/circumType/getAll", 
+    url: `${process.env.BASE_API}school-map/circumType/getAll`, 
     success: function(res){
         console.log('周边',res)
         if(res.code == 200) {

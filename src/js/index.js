@@ -4,6 +4,50 @@ import { GetQueryString, fuzzyQuery, CalculationX, CalculationZ, unid, erwei } f
 import loadGltf from '../utils/loadGltf';
 import $ from 'jquery';
 import arrJson from '../utils/test.json';
+console.log(process.env.BASE_API)
+/*缓存数据*/
+function openDB (dbName, version, storeName) {
+    return new Promise((resolve, reject) => {
+      const indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+      const request = indexedDB.open(dbName, version)
+      request.onsuccess = function (e) {
+        resolve(e.target.result)
+      } 
+      request.onerror = function (e) {
+        reject(e)
+      } 
+      request.onupgradeneeded = function (e) {
+        const db = e.target.result
+        if (!db.objectStoreNames.contains(storeName)) {
+          const objectStore = db.createObjectStore(storeName, {
+            keyPath: 'id',
+            autoIncrement: true
+          })
+          objectStore.createIndex('index', 'filename', {
+            unique: false
+          })
+          localStorage.setItem('storageDB', true);
+        }
+      } 
+    })
+}
+
+function doSomethingToDb (dbName, version, storeName, data) {
+    openDB(dbName, version, storeName)
+      .then(db => {
+        const tx = db.transaction(storeName, 'readwrite')
+        const store = tx.objectStore(storeName)
+        const req = store.put(data)
+        req.onsuccess = res => {
+          console.log('保存成功', res)
+        } 
+      })
+      .catch(err => {
+        console.error(err)
+      })
+}
+  
+
 /* 地图路线绘制 */
 const map = new AMap.Map("mapBox", {
     viewMode:'3D',
@@ -32,7 +76,7 @@ const map = new AMap.Map("mapBox", {
     * position 校园风光位置
     * meshBg 地图底图
 */
-let scene, camera, renderer, controls, mesh, meshEnd, curve, progress=0, startPathX, startPathZ, controlsFlag, stepsList = [], clickX, clickZ, meshBg;
+let scene, camera, renderer, controls, mesh, meshEnd, curve, progress=0, startPathX, startPathZ, controlsFlag, stepsList = [], clickX, clickZ;
 const center = GetQueryString('center');
 const nearby = GetQueryString('nearby');
 const startCenter = GetQueryString('startCenter');
@@ -70,6 +114,9 @@ function initCamera() {
         // 修改相机坐标
         camera.position.set(startPathX, .18, startPathZ);
         geolocation();
+        setInterval(function() {
+            geolocation(); 
+        },2000)
     }else if(controlsFlag == 'manyou') {
         const manyouPathX = CalculationX(116.64861023);
         const manyouPathZ = CalculationZ(39.92165992);
@@ -94,19 +141,19 @@ function initRender() {
 function initLight() {
   // 半球光就是渐变的光；
   // 第一个参数是天空的颜色，第二个参数是地上的颜色，第三个参数是光源的强度
-  var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, 1.2);
+  var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, 1.5);
 
    // 方向光是从一个特定的方向的照射
    // 类似太阳，即所有光源是平行的
    // 第一个参数是关系颜色，第二个参数是光源强度
-  var shadowLight = new THREE.DirectionalLight(0xffffff, .5);
+  var shadowLight = new THREE.DirectionalLight(0xffffff, 1.5);
 
     // 设置光源的方向。  
    // 位置不同，方向光作用于物体的面也不同，看到的颜色也不同
-   shadowLight.position.set(15, 10, 35);
+   shadowLight.position.set(100, 100, 100);
 
     // 为了使这些光源呈现效果，只需要将它们添加到场景中
-    var ambientLight = new THREE.AmbientLight(0xdc8874, 1);
+    var ambientLight = new THREE.AmbientLight(0xdc8874, 1.5);
     var spotLight = new  THREE.SpotLight(0xFFFFFF);
     spotLight.position.set(100, 100, 100);
     scene.add(spotLight);
@@ -151,27 +198,75 @@ function initControls() {
 function initContent() {
 
     // 加载 glTF 格式的模型
-    let loader = new THREE.GLTFLoader(); /*实例化加载器*/
+    let loader; /*实例化加载器*/
     // 分批加载资源
-    loadGltf.forEach(item => {
-        loader.load(`http://47.92.118.208:8081/School/${item.name}/${item.name}.gltf`, function (obj) {
-            console.log(obj)
-            // 修改位置坐标
-            obj.scene.position.y = 0;
-            obj.scene.position.x = 0;
-            obj.scene.position.z = 0;
-            scene.add(obj.scene);
-            // document.getElementById('loading').style.display = 'none';
+    loadGltf.forEach((item, index) => {
+        //  Files
+        console.log(localStorage.getItem('storageDB'));
+        const storageDB = localStorage.getItem('storageDB')
+        if(storageDB) {
+            loader = new THREE.OBJLoader();
+            const request = indexedDB.open('worldDB', 1);
+
+            request.addEventListener('success', e => {
+                const db = e.target.result;
+                const tx = db.transaction('Files','readwrite');
     
-        }, function (xhr) {
+                const store = tx.objectStore('Files');
     
-            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                // 获取数据
+                const reqGet = store.get(index);
     
-        }, function (error) {
-    
-            console.log('load error!' + error.getWebGLErrorMessage());
-    
-        })
+                reqGet.addEventListener('success', e => {
+                    if(!reqGet.result) {
+                        return false;
+                    }
+                    console.log('--------------------------------------------', reqGet.result.content);
+                    loader.load().parse(reqGet.result.content, function (obj) {
+                        // console.log(obj)
+                        // 修改位置坐标
+                        obj.scene.position.y = 0;
+                        obj.scene.position.x = 0;
+                        obj.scene.position.z = 0;
+                        scene.add(obj.scene);
+                
+                    }, function (xhr) {
+                
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                
+                    }, function (error) {
+                
+                        console.log('load error!' + error.getWebGLErrorMessage());
+                
+                    })
+                })
+            });
+        }else {
+            loader = new THREE.GLTFLoader();
+            loader.load(`${process.env.BASE_API}School/${item.name}/${item.name}.gltf`, function (obj) {
+                // console.log(obj)
+                // 修改位置坐标
+                obj.scene.position.y = 0;
+                obj.scene.position.x = 0;
+                obj.scene.position.z = 0;
+                scene.add(obj.scene);
+                console.log(scene)
+                // doSomethingToDb('worldDB', 1, 'Files', {
+                //     filename: item.name,
+                //     id: index,
+                //     "content": JSON.parse(JSON.stringify(obj.scene.toJSON()))
+                // })
+        
+            }, function (xhr) {
+        
+                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        
+            }, function (error) {
+        
+                console.log('load error!' + error.getWebGLErrorMessage());
+        
+            })
+        }
     })
 
 }
@@ -185,7 +280,7 @@ function initBg() {
             map: texture,
             transparent: true
         });
-        meshBg = new THREE.Mesh(skyBoxGeometry1, material);
+        const meshBg = new THREE.Mesh(skyBoxGeometry1, material);
         meshBg.position.y = 0;
         meshBg.position.x = 0;
         meshBg.position.z = 0;
@@ -211,7 +306,7 @@ function initBg() {
 /* 加载天空盒子 */
 function makeSkybox() {
     // scene.background = new THREE.CubeTextureLoader()
-    // .setPath("http://47.92.118.208:8081/skybox/")
+    // .setPath("https://ryxy-china.picp.vip:8081/skybox/")
     // .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png', ]);
     //这部分是给出图片的位置及图片名
     var directions  = ["px", "nx", "py", "ny", "pz", "nz"];//获取对象
@@ -344,7 +439,7 @@ function manyouPath(startLon, startLat, endLon,endLat) {
             // 相机管道，更方便直观的看相机走的路线
             // var tubeGeometry = new THREE.TubeGeometry(curve, 0, 0, 0, false);
             // var textureLoader = new THREE.TextureLoader();
-            // var texture = textureLoader.load('http://47.92.118.208:8081/01.png');
+            // var texture = textureLoader.load('https://ryxy-china.picp.vip:8081/01.png');
             // texture.wrapS = THREE.RepeatWrapping
             // texture.wrapT=THREE.RepeatWrapping
             // // 设置x方向的偏移(沿着管道路径方向)，y方向默认1
@@ -372,9 +467,7 @@ var length = 2000;
 function initGround() {
 	var geometry = new THREE.Geometry();
 	geometry.vertices.push(new THREE.Vector3(-length / 50, 0, 0));
-	geometry.vertices.push(new THREE.Vector3(length / 50, 0, 0));
-
-	//播放动画请注释一下内容			
+	geometry.vertices.push(new THREE.Vector3(length / 50, 0, 0));			
 	for(var i = 0; i <= length / 10; i++) {
 		var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
 			color: 0x808080,
@@ -430,7 +523,7 @@ function initGrid() {
 /* 设置导航路线 */
 function axes(startLon, startLat, endLon,endLat, fn) {
     //定义材质THREE.LineBasicMaterial . MeshBasicMaterial...都可以
-    var material = new THREE.LineBasicMaterial({color:0xff6804, linewidth: 500});
+    var material = new THREE.LineBasicMaterial({color:0xff6804, linewidth: 10});
     // 空几何体，里面没有点的信息,不想BoxGeometry已经有一系列点，组成方形了。
     var geometry = new THREE.Geometry();
     var maps = new Graph(arrJson);
@@ -519,20 +612,23 @@ function loadImg() {
     const x = CalculationX(startPathX);
     const z = CalculationZ(startPathZ);
     console.log(x, z)
-    var skyBoxGeometry = new THREE.PlaneGeometry(); 
-    var texture = new THREE.TextureLoader().load(require(`../static/img/01.png`));
+    var skyBoxGeometry = new THREE.PlaneGeometry(1.5, 1.5); 
+    var texture = new THREE.TextureLoader().load(require(`../static/img/ren.png`));
     var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
     });
     mesh = new THREE.Mesh(skyBoxGeometry, material);
-    mesh.position.y = 0.5;
+    mesh.position.y = 0.8;
     mesh.position.x = x;
     mesh.position.z = z;
     mesh.rotation.x += -0.5 * Math.PI;
     mesh.rotation.z += -1 * Math.PI;
     scene.add(mesh);
     geolocation();
+    setInterval(function() {
+        geolocation();
+    }, 2000)
 }
 
 /*加载起点图标*/
@@ -746,7 +842,7 @@ function animate() {
 let mapList = [];
 // 获取模糊查询信息
 $.ajax({ 
-    url: "http://47.92.118.208/school-map/sitePosition/getAll", 
+    url: `${process.env.BASE_API}school-map/sitePosition/getAll`, 
     success: function(res){
         console.log('模糊查询',res)
         if(res.code == 200) {
@@ -775,13 +871,13 @@ $.ajax({
 /* 全景图展示 */
 if (center) {
     // 获取全景展示信息
-    // http://47.92.118.208/school-map/quanjing/getAll
+    // https://ryxy-china.picp.vip/school-map/quanjing/getAll
     $('.head').show().find('span').html('退出全景');
     $('.serach').hide();
     $('.menu').hide();
     $('.footer').hide();
     $.ajax({ 
-        url: "http://47.92.118.208/school-map/quanjing/getAll", 
+        url: `${process.env.BASE_API}school-map/quanjing/getAll`, 
         success: function(res){
             console.log('全景图',res)
             if(res.code == 200) {
@@ -831,9 +927,13 @@ $('.search-btn').click(function() {
             /**
              * 执行加载终点坐标方法绘制点并且导航
              */
+            loadStartImg(startPathX, startPathZ)
             loadEndImg(position[0], position[1], function() {
+                alert(startPathX);
+                alert(startPathZ)
                 $('.serach').hide();
-                axes(116.64861023,39.92165992, position[0], position[1], function(result) {
+                axes(startPathX, startPathZ, position[0], position[1], function(result) {
+                    alert('执行事件')
                     $('.distance').show();
                     $('.head').show().find('span').html('退出导航');
                     $('.title').html('');
@@ -865,7 +965,7 @@ if (nearby) {
         return new Promise(function(resolve, reject){
             // 获取周边详细信息
             $.ajax({ 
-                url: `http://47.92.118.208/school-map/circum/getByTypeId?typeId=${nearby}`, 
+                url: `${process.env.BASE_API}school-map/circum/getByTypeId?typeId=${nearby}`, 
                 success: function(res){
                     console.log('周边详细信息',res)
                     if(res.code == 200) {
@@ -904,7 +1004,7 @@ if (nearby) {
              * 显示终点坐标
              */
             loadEndImg(position[0], position[1], function() {
-                axes(116.64861023,39.92165992, position[0], position[1])
+                axes(CalculationX(startPathX), CalculationZ(startPathZ), position[0], position[1])
             });
         })
     })
@@ -922,7 +1022,7 @@ if (position) {
      */
     loadEndImg(positions[0], positions[1], function() {
         $('.serach').hide();
-        axes(116.64861023,39.92165992, positions[0], positions[1])
+        axes(CalculationX(startPathX), CalculationZ(startPathZ), positions[0], positions[1])
     });
 }
 
@@ -964,8 +1064,9 @@ function geolocation () {
 function onComplete(data) {
     if(data.position) {
         const initPosition = JSON.parse(JSON.stringify(data.position));
-        startPathX = initPosition.lng;
-        startPathZ = initPosition.lat;
+        startPathX = 116.643804 < initPosition.lng && initPosition.lng <116.650751 ? initPosition.lng : 116.648653;
+        startPathZ = 39.921923 < initPosition.lat && initPosition.lat < 39.919047 ? initPosition.lat : 39.921664;
+        /*
         var str = [];
         str.push('定位结果：' + data.position);
         str.push('定位类别：' + data.location_type);
@@ -974,9 +1075,8 @@ function onComplete(data) {
         }//如为IP精确定位结果则没有精度信息
         str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
         document.getElementById('weizhi').innerHTML =  str.join('<br>') + '您的位置：'+startPathX+',<br/>'+startPathZ +'<br/>' +CalculationX(startPathX)+'<br/>' +CalculationZ(startPathZ);
+        */
         if(controlsFlag == 'pingmian') {
-            // const x = CalculationX(116.64761);
-            // const z = CalculationZ(39.921372);
             mesh.position.x = CalculationX(startPathX);
             mesh.position.z = CalculationZ(startPathZ);
         }
@@ -987,7 +1087,12 @@ function onComplete(data) {
 }
 //解析定位错误信息
 function onError(data) {
-    alert(JSON.stringify(data))
+    // alert(JSON.stringify(data))
+    if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
+        // 116.648653,39.921664
+        mesh.position.x = CalculationX(116.648653);
+        mesh.position.z = CalculationZ(39.921664);
+    }
     console.log(data)
 }
 $(".service").click(function(){
@@ -1004,7 +1109,7 @@ $(".activity-title").click(function() {
     const index = $(this).parent('.activity').attr('data-index');
     const flag = $(this).parent('.activity').attr('data-flag');
     $.ajax({ 
-        url: `http://47.92.118.208/school-map/serviceInfo/getByType?type=${index}`, 
+        url: `${process.env.BASE_API}school-map/serviceInfo/getByType?type=${index}`, 
         success: function(res){
             if(res.code == 200) {
                 const schoolList = res.data;
@@ -1098,9 +1203,9 @@ $(".activity-title").click(function() {
                         $(".service-container").hide();
                         $(".container").hide();
                         const endCenterArr = center.split(',');
-                        loadStartImg(116.64861023,39.92165992)
+                        loadStartImg(CalculationX(startPathX), CalculationZ(startPathZ))
                         loadEndImg(endCenterArr[0], endCenterArr[1])
-                        axes(116.64861023,39.92165992, endCenterArr[0], endCenterArr[1])
+                        axes(CalculationX(startPathX), CalculationZ(startPathZ), endCenterArr[0], endCenterArr[1])
                     })                        
                     
                 })
@@ -1114,13 +1219,6 @@ $('.daohang').click(function () {
     // geolocation();
     // walk(initCenter, endPosition, name, true, true);
     geolocation();
-    setInterval(() => {
-        geolocation();
-        // const x = CalculationX(116.64761);
-        // const z = CalculationZ(39.921372);
-        // mesh.position.x = startPathX;
-        // mesh.position.z = startPathZ;
-    }, 3000);
 })
 // 视角切换
 $('.3D').click(function () {
@@ -1145,6 +1243,9 @@ function orientationHandler(event) {
     // text += "前后旋转：rotate beta{" + Math.round(event.beta) + "deg)<br>";  
     // text += "扭转设备：rotate gamma{" + Math.round(event.gamma) + "deg)<br>";  
     // arrow.innerHTML = text;  
-    mesh.rotation.z = (event.alpha + 90)/180*Math.PI;
+    if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
+        mesh.rotation.z = (event.alpha - 135)/180*Math.PI;
+    }
     // mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
-}  
+}
+

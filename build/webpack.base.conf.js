@@ -44,67 +44,77 @@ var config = {
         ]
     },
     plugins: [
-        new htmlWebpackPlugin({
-          filename: "index.html",
-          title: "index",
-          template: path.resolve(__dirname, '../src/index.html'),
-          chunks: ['index']
-        }),
-        new htmlWebpackPlugin({
-          filename: "periphery.html",
-          title: "periphery",
-          template: path.resolve(__dirname, '../src/periphery.html'),
-          chunks: ['periphery']
-        }),
-        new htmlWebpackPlugin({
-          filename: "panorama.html",
-          title: "panorama",
-          template: path.resolve(__dirname, '../src/panorama.html'),
-          chunks: ['panorama']
-        }), 
-        new htmlWebpackPlugin({
-          filename: "panoramaContainer.html",
-          title: "panoramaContainer",
-          template: path.resolve(__dirname, '../src/panoramaContainer.html'),
-          chunks: ['panoramaContainer']
-        }),  
-        new htmlWebpackPlugin({
-          filename: "school.html",
-          title: "school",
-          template: path.resolve(__dirname, '../src/school.html'),
-          chunks: ['school']
-        }), 
-        new htmlWebpackPlugin({
-          filename: "photo.html",
-          title: "photo",
-          template: path.resolve(__dirname, '../src/photo.html'),
-          chunks: ['photo']
-        }),
-        new htmlWebpackPlugin({
-          filename: "route.html",
-          title: "route",
-          template: path.resolve(__dirname, '../src/route.html'),
-          chunks: ['route']
-        }),
-        new htmlWebpackPlugin({
-          filename: "roam.html",
-          title: "roam",
-          template: path.resolve(__dirname, '../src/roam.html'),
-          chunks: ['roam']
-        }),                 
-        new AutodllWebpackpackPlugin({
-          inject: true,
-          debugger: true,
-          filename: '[name].js',
-          path: './dll',
-          entry: {
-            vendor: ['jquery']
-          }
-        }), // 单独打包第三方库
-        new webpack.optimize.SplitChunksPlugin() //提取公共代码
-      ],
-      resolve: {
-        extensions: ['.js', '.css', '.less']// 省去后缀
+      new htmlWebpackPlugin({
+        filename: "index.html",
+        title: "index",
+        template: path.resolve(__dirname, '../src/index.html'),
+        chunks: ['index']
+      }),
+      new htmlWebpackPlugin({
+        filename: "periphery.html",
+        title: "periphery",
+        template: path.resolve(__dirname, '../src/periphery.html'),
+        chunks: ['periphery']
+      }),
+      new htmlWebpackPlugin({
+        filename: "panorama.html",
+        title: "panorama",
+        template: path.resolve(__dirname, '../src/panorama.html'),
+        chunks: ['panorama']
+      }), 
+      new htmlWebpackPlugin({
+        filename: "panoramaContainer.html",
+        title: "panoramaContainer",
+        template: path.resolve(__dirname, '../src/panoramaContainer.html'),
+        chunks: ['panoramaContainer']
+      }),  
+      new htmlWebpackPlugin({
+        filename: "school.html",
+        title: "school",
+        template: path.resolve(__dirname, '../src/school.html'),
+        chunks: ['school']
+      }), 
+      new htmlWebpackPlugin({
+        filename: "photo.html",
+        title: "photo",
+        template: path.resolve(__dirname, '../src/photo.html'),
+        chunks: ['photo']
+      }),
+      new htmlWebpackPlugin({
+        filename: "route.html",
+        title: "route",
+        template: path.resolve(__dirname, '../src/route.html'),
+        chunks: ['route']
+      }),
+      new htmlWebpackPlugin({
+        filename: "roam.html",
+        title: "roam",
+        template: path.resolve(__dirname, '../src/roam.html'),
+        chunks: ['roam']
+      }),                 
+      new AutodllWebpackpackPlugin({
+        inject: true,
+        debugger: true,
+        filename: '[name].js',
+        path: './dll',
+        entry: {
+          vendor: ['jquery']
+        }
+      }), // 单独打包第三方库
+      new webpack.optimize.SplitChunksPlugin() //提取公共代码
+    ],
+    devServer: {
+      proxy: {
+        '/api': {
+          target: 'https://ryxy-china.picp.vip/',
+          pathRewrite: {'^/api' : ''},
+          changeOrigin: true,     // target是域名的话，需要这个参数，
+          secure: true,          // 设置支持https协议的代理
+        }
       }
+    },
+    resolve: {
+      extensions: ['.js', '.css', '.less']// 省去后缀
+    }
 }
 module.exports = config;
