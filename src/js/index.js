@@ -141,19 +141,19 @@ function initRender() {
 function initLight() {
   // 半球光就是渐变的光；
   // 第一个参数是天空的颜色，第二个参数是地上的颜色，第三个参数是光源的强度
-  var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, 1.5);
+  var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, 1);
 
    // 方向光是从一个特定的方向的照射
    // 类似太阳，即所有光源是平行的
    // 第一个参数是关系颜色，第二个参数是光源强度
-  var shadowLight = new THREE.DirectionalLight(0xffffff, 1.5);
+  var shadowLight = new THREE.DirectionalLight(0xffffff, 1);
 
     // 设置光源的方向。  
    // 位置不同，方向光作用于物体的面也不同，看到的颜色也不同
    shadowLight.position.set(100, 100, 100);
 
     // 为了使这些光源呈现效果，只需要将它们添加到场景中
-    var ambientLight = new THREE.AmbientLight(0xdc8874, 1.5);
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1);
     var spotLight = new  THREE.SpotLight(0xFFFFFF);
     spotLight.position.set(100, 100, 100);
     scene.add(spotLight);
@@ -204,8 +204,13 @@ function initContent() {
         //  Files
         console.log(localStorage.getItem('storageDB'));
         const storageDB = localStorage.getItem('storageDB')
+        // $.ajax({ 
+        //     url: `${process.env.BASE_API}School/${item.name}/${item.name}.gltf`, 
+        //     success: function(res){
+        //         console.log('加载终。。。。。',res) 
+        //     }
+        // });
         if(storageDB) {
-            loader = new THREE.OBJLoader();
             const request = indexedDB.open('worldDB', 1);
 
             request.addEventListener('success', e => {
@@ -221,41 +226,55 @@ function initContent() {
                     if(!reqGet.result) {
                         return false;
                     }
-                    console.log('--------------------------------------------', reqGet.result.content);
-                    loader.load().parse(reqGet.result.content, function (obj) {
-                        // console.log(obj)
+                    // console.log('--------------------------------------------', reqGet.result);
+                    const content = reqGet.result.content;
+                    const position = reqGet.result.position;
+                    const scale = reqGet.result.scale;
+                    loader = new THREE.ObjectLoader();
+                    loader.parse(content, function(e) {
+                        // console.log(e)
+                        var mesh = new THREE.Mesh( e.geometry, e.material );
                         // 修改位置坐标
-                        obj.scene.position.y = 0;
-                        obj.scene.position.x = 0;
-                        obj.scene.position.z = 0;
-                        scene.add(obj.scene);
-                
-                    }, function (xhr) {
-                
-                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                
-                    }, function (error) {
-                
-                        console.log('load error!' + error.getWebGLErrorMessage());
-                
-                    })
+                        mesh.scale.set(scale.x, scale.y, scale.z)
+                        mesh.position.y = position.y;
+                        mesh.position.x = position.x;
+                        mesh.position.z = position.z;
+                        scene.add( mesh );
+                    }, '.');
                 })
             });
         }else {
             loader = new THREE.GLTFLoader();
             loader.load(`${process.env.BASE_API}School/${item.name}/${item.name}.gltf`, function (obj) {
                 // console.log(obj)
+                const gltfChildren = obj.scene.children[0];
+                const scale = JSON.parse(JSON.stringify(gltfChildren.scale));
+                const position = JSON.parse(JSON.stringify(gltfChildren.position));
+                var mesh = new THREE.Mesh( gltfChildren.geometry, gltfChildren.material );
+                // 定义大小
+                mesh.scale.set(scale.x, scale.y, scale.z);
                 // 修改位置坐标
-                obj.scene.position.y = 0;
-                obj.scene.position.x = 0;
-                obj.scene.position.z = 0;
-                scene.add(obj.scene);
-                console.log(scene)
-                // doSomethingToDb('worldDB', 1, 'Files', {
-                //     filename: item.name,
-                //     id: index,
-                //     "content": JSON.parse(JSON.stringify(obj.scene.toJSON()))
-                // })
+                mesh.position.y = position.y;
+                mesh.position.x = position.x;
+                mesh.position.z = position.z;
+                scene.add(mesh);
+                /*简便加载gltf模型*/
+                /*
+                var object = obj.scene
+                // 修改位置坐标
+                object.position.y = 0;
+                object.position.x = 0;
+                object.position.z = 0;
+                scene.add(object);
+                */
+                doSomethingToDb('worldDB', 1, 'Files', {
+                    filename: item.name,
+                    id: index,
+                    "content": JSON.parse(JSON.stringify(mesh.toJSON())),
+                    position,
+                    scale
+                })
+                // console.log(mesh)
         
             }, function (xhr) {
         
@@ -275,7 +294,7 @@ function initContent() {
 function initBg() {
     var skyBoxGeometry1 = new THREE.PlaneGeometry(78, 39, 1); 
     for(let i = 1, n = 5; i <= 5; i++) {
-        var texture = new THREE.TextureLoader().load(require(`../static/schoolatlas/0${i}.png`));
+        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}schoolatlas/0${i}.png`);
         var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
@@ -289,7 +308,7 @@ function initBg() {
     }
     var skyBoxGeometry2 = new THREE.PlaneGeometry(111, 55, 1); 
     for(let i = 1, n = 5; i <= 5; i++) {
-        var texture = new THREE.TextureLoader().load(require(`../static/schoolatlas/m0${i}.png`));
+        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}schoolatlas/m0${i}.png`);
         var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
@@ -318,7 +337,7 @@ function makeSkybox() {
     for (var i = 0; i < 6; i++)
         materialArray.push( new THREE.MeshBasicMaterial({
             //这里imagePrefix + directions[i] + imageSuffix 就是将图片路径弄出来
-            map: new THREE.TextureLoader().load( require(`../static/skybox/${directions[i]}.png`) ),
+            map: new THREE.TextureLoader().load(`${process.env.BASE_API}skybox/${directions[i]}.png`),
             side: THREE.BackSide  //因为这里我们的场景是在天空盒的里面，所以这里设置为背面应用该材质
         }));
 
