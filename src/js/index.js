@@ -82,13 +82,15 @@ const nearby = GetQueryString('nearby');
 const startCenter = GetQueryString('startCenter');
 const endCenter = GetQueryString('endCenter');
 const position = GetQueryString('position');
+// 是否缓存
+const storageDB = localStorage.getItem('storageDB')
 // 导航初始值
 let initCenter = [116.648432,39.92166];
 //导航结束值
 let endPosition = [];
 /* 初始坐标在北门 */
-startPathX = CalculationX(116.64861023);
-startPathZ = CalculationZ(39.92165992);
+startPathX = CalculationX(116.648592);
+startPathZ = CalculationZ(39.921754);
 // 默认为地三人称相机
 controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 
@@ -139,21 +141,25 @@ function initRender() {
 
 /* 灯光 */
 function initLight() {
+  let light = 1;
+  if (storageDB) {
+    light = 0.6;
+  }
   // 半球光就是渐变的光；
   // 第一个参数是天空的颜色，第二个参数是地上的颜色，第三个参数是光源的强度
-  var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, 1);
+  var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, light);
 
    // 方向光是从一个特定的方向的照射
    // 类似太阳，即所有光源是平行的
    // 第一个参数是关系颜色，第二个参数是光源强度
-  var shadowLight = new THREE.DirectionalLight(0xffffff, 1);
+  var shadowLight = new THREE.DirectionalLight(0xffffff, light);
 
     // 设置光源的方向。  
    // 位置不同，方向光作用于物体的面也不同，看到的颜色也不同
    shadowLight.position.set(100, 100, 100);
 
     // 为了使这些光源呈现效果，只需要将它们添加到场景中
-    var ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    var ambientLight = new THREE.AmbientLight(0xffffff, light);
     var spotLight = new  THREE.SpotLight(0xFFFFFF);
     spotLight.position.set(100, 100, 100);
     scene.add(spotLight);
@@ -202,14 +208,6 @@ function initContent() {
     // 分批加载资源
     loadGltf.forEach((item, index) => {
         //  Files
-        console.log(localStorage.getItem('storageDB'));
-        const storageDB = localStorage.getItem('storageDB')
-        // $.ajax({ 
-        //     url: `${process.env.BASE_API}School/${item.name}/${item.name}.gltf`, 
-        //     success: function(res){
-        //         console.log('加载终。。。。。',res) 
-        //     }
-        // });
         if(storageDB) {
             const request = indexedDB.open('worldDB', 1);
 
@@ -227,37 +225,68 @@ function initContent() {
                         return false;
                     }
                     // console.log('--------------------------------------------', reqGet.result);
-                    const content = reqGet.result.content;
-                    const position = reqGet.result.position;
-                    const scale = reqGet.result.scale;
-                    loader = new THREE.ObjectLoader();
-                    loader.parse(content, function(e) {
-                        // console.log(e)
-                        var mesh = new THREE.Mesh( e.geometry, e.material );
-                        // 修改位置坐标
-                        mesh.scale.set(scale.x, scale.y, scale.z)
-                        mesh.position.y = position.y;
-                        mesh.position.x = position.x;
-                        mesh.position.z = position.z;
-                        scene.add( mesh );
-                    }, '.');
+                    const content = JSON.parse(reqGet.result.content);
+                    const position = JSON.parse(reqGet.result.position);
+                    const rotation = JSON.parse(reqGet.result.rotation);
+                    const scale = JSON.parse(reqGet.result.scale);
+                    // console.log(content)
+                    content.forEach((items, index) => {
+                        loader = new THREE.ObjectLoader();
+                        loader.parse(items, function(e) {
+                            
+                            var mesh = new THREE.Mesh( e.geometry, e.material );
+                            // 修改大小
+                            mesh.scale.set(scale[index].x, scale[index].y, scale[index].z)
+                            // 定义旋转
+                            mesh.rotation.set(rotation[index]._x, rotation[index]._y, rotation[index]._z);
+                            // 修改位置坐标
+                            mesh.position.y = position[index].y;
+                            mesh.position.x = position[index].x;
+                            mesh.position.z = position[index].z;
+                            scene.add( mesh );
+                        }, '.');
+                    })
+ 
                 })
             });
         }else {
             loader = new THREE.GLTFLoader();
             loader.load(`${process.env.BASE_API}School/${item.name}/${item.name}.gltf`, function (obj) {
-                // console.log(obj)
-                const gltfChildren = obj.scene.children[0];
-                const scale = JSON.parse(JSON.stringify(gltfChildren.scale));
-                const position = JSON.parse(JSON.stringify(gltfChildren.position));
-                var mesh = new THREE.Mesh( gltfChildren.geometry, gltfChildren.material );
-                // 定义大小
-                mesh.scale.set(scale.x, scale.y, scale.z);
-                // 修改位置坐标
-                mesh.position.y = position.y;
-                mesh.position.x = position.x;
-                mesh.position.z = position.z;
-                scene.add(mesh);
+                console.log(`模型返回值=====${item.name}`,obj)
+                let gltfChildren = obj.scene.children;
+                let scales = [];
+                let positions = [];
+                let rotations = [];
+                let meshs = [];
+                gltfChildren.forEach(items => {
+                    const scale = JSON.parse(JSON.stringify(items.scale));
+                    const position = JSON.parse(JSON.stringify(items.position));
+                    const rotation = JSON.parse(JSON.stringify(items.rotation));
+                    var mesh = new THREE.Mesh( items.geometry, items.material );
+                    // console.log(`模型返回值=====${item.name}`,JSON.parse(JSON.stringify(items)))
+                    // 定义大小
+                    mesh.scale.set(scale.x, scale.y, scale.z);
+                    // 定义旋转
+                    mesh.rotation.set(rotation._x, rotation._y, rotation._z);
+                    // 修改位置坐标
+                    mesh.position.y = position.y;
+                    mesh.position.x = position.x;
+                    mesh.position.z = position.z;
+                    scales.push(scale);
+                    positions.push(position);
+                    rotations.push(rotation);
+                    meshs.push(mesh);
+                    scene.add(mesh);
+                })
+                doSomethingToDb('worldDB', 1, 'Files', {
+                    "filename": item.name,
+                    "id": index,
+                    "content": JSON.stringify(meshs),
+                    "position": JSON.stringify(positions),
+                    "scale": JSON.stringify(scales),
+                    "rotation": JSON.stringify(rotations)
+                })
+                    // console.log(mesh)                
                 /*简便加载gltf模型*/
                 /*
                 var object = obj.scene
@@ -267,14 +296,7 @@ function initContent() {
                 object.position.z = 0;
                 scene.add(object);
                 */
-                doSomethingToDb('worldDB', 1, 'Files', {
-                    filename: item.name,
-                    id: index,
-                    "content": JSON.parse(JSON.stringify(mesh.toJSON())),
-                    position,
-                    scale
-                })
-                // console.log(mesh)
+
         
             }, function (xhr) {
         
@@ -293,7 +315,7 @@ function initContent() {
 /* 地图底图 加载底图图片 PlaneGeometry二维平面*/
 function initBg() {
     var skyBoxGeometry1 = new THREE.PlaneGeometry(78, 39, 1); 
-    for(let i = 1, n = 5; i <= 5; i++) {
+    for(let i = 1, n = 5; i <= n; i++) {
         var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}schoolatlas/0${i}.png`);
         var material = new THREE.MeshBasicMaterial({
             map: texture,
@@ -306,17 +328,17 @@ function initBg() {
         meshBg.rotation.x += -0.5 * Math.PI;
         scene.add(meshBg);
     }
-    var skyBoxGeometry2 = new THREE.PlaneGeometry(111, 55, 1); 
-    for(let i = 1, n = 5; i <= 5; i++) {
+    var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1); 
+    for(let i = 1, n = 4; i <= n; i++) {
         var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}schoolatlas/m0${i}.png`);
         var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
         });
         var meshBg = new THREE.Mesh(skyBoxGeometry2, material);
-        meshBg.position.y = -0.4;
+        meshBg.position.y = -.4;
         meshBg.position.x = .3;
-        meshBg.position.z = -.5;
+        meshBg.position.z = 2;
         meshBg.rotation.x += -0.5 * Math.PI;
         scene.add(meshBg);
     }    
@@ -330,7 +352,7 @@ function makeSkybox() {
     //这部分是给出图片的位置及图片名
     var directions  = ["px", "nx", "py", "ny", "pz", "nz"];//获取对象
     //创建一个立方体并且设置大小
-    var skyGeometry = new THREE.CubeGeometry( 100, 30, 50 );
+    var skyGeometry = new THREE.CubeGeometry( 160, 160, 160 );
     //这里是用于天空盒六个面储存多个材质的数组
     var materialArray = [];
     //循环将图片加载出来变成纹理之后将这个物体加入数组中
@@ -547,8 +569,8 @@ function axes(startLon, startLat, endLon,endLat, fn) {
     var geometry = new THREE.Geometry();
     var maps = new Graph(arrJson);
 
-    var startX= Math.round(CalculationX(startLon) * 2.5 + 100);
-    var startY= Math.round(CalculationZ(startLat) * 2.5 + 100);
+    var startX= Math.round(startLon * 2.5 + 100);
+    var startY= Math.round(startLat * 2.5 + 100);
     var endX= Math.round(CalculationX(endLon) * 2.5 + 100);
     var endY= Math.round(CalculationZ(endLat) * 2.5 + 100);
     var start = maps.grid[startX][startY];
@@ -589,25 +611,27 @@ function axes(startLon, startLat, endLon,endLat, fn) {
         // 给空白几何体添加点信息，这里写3个点，geometry会把这些点自动组合成线，面。
         geometry.vertices.push(new THREE.Vector3(item[0], .2, item[1]));
     })
+    console.log(pathArr)
     //线构造
     var line=new THREE.Line(geometry,material);
     // 加入到场景中
     scene.add(line); 
     if (fn) {
-        //步行导航
-        var walking = new AMap.Walking({
-            map: map
-        }); 
-        //根据起终点坐标规划步行路线
-        walking.search([startLon, startLat], [endLon, endLat], function(status, result) {
-            // result即是对应的步行路线数据信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkingResult
-            if (status === 'complete') {
-                fn(result)
-            } else {
-                console.log('失败')
-                // log.error('步行路线数据查询失败' + result)
-            } 
-        });
+        fn(pathArr.length * 4)
+        // //步行导航
+        // var walking = new AMap.Walking({
+        //     map: map
+        // }); 
+        // //根据起终点坐标规划步行路线
+        // walking.search([startLon, startLat], [endLon, endLat], function(status, result) {
+        //     // result即是对应的步行路线数据信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkingResult
+        //     if (status === 'complete') {
+        //         fn(result)
+        //     } else {
+        //         console.log('失败')
+        //         // log.error('步行路线数据查询失败' + result)
+        //     } 
+        // });
     }
 
 }
@@ -628,8 +652,8 @@ function loadImg() {
     scene.add(axes);
     */
     // 需要改为定位获取
-    const x = CalculationX(startPathX);
-    const z = CalculationZ(startPathZ);
+    const x = startPathX;
+    const z = startPathZ;
     console.log(x, z)
     var skyBoxGeometry = new THREE.PlaneGeometry(1.5, 1.5); 
     var texture = new THREE.TextureLoader().load(require(`../static/img/ren.png`));
@@ -653,8 +677,8 @@ function loadImg() {
 /*加载起点图标*/
 function loadStartImg(x, z) {
     // 需要改为定位获取
-    clickX = CalculationX(x);
-    clickZ = CalculationZ(z);
+    clickX = x;
+    clickZ = z;
     var skyBoxGeometry = new THREE.CubeGeometry(); 
     var texture = new THREE.TextureLoader().load(require(`../static/img/Start.png`));
     var material = new THREE.MeshBasicMaterial({
@@ -684,14 +708,12 @@ function loadEndImg(x, z, fn) {
     meshEnd.position.x = clickX;
     meshEnd.position.z = clickZ;
     scene.add(meshEnd);
-    window.addEventListener( 'click', onMouseClick.bind(window, clickX, clickZ, fn), false );
+    window.addEventListener( 'click', onMouseClick.bind(window, fn), false );
 }
 /**
  * 把点击事件放到最外边获取点击的坐标
  */
-// window.addEventListener( 'click', onMouseClick.bind(window, clickX, clickZ, function() {
-
-// }), false );
+// window.addEventListener( 'click', onMouseClick.bind(window, function() {}), false );
 
 /**封装点击事件 */
 /**
@@ -704,7 +726,7 @@ function loadEndImg(x, z, fn) {
  */
 let clickX2 = 0;
 let clickZ2 = 0;
-function onMouseClick(x, z, fn, event ) {
+function onMouseClick(fn, event ) {
     //声明raycaster和mouse变量
     var raycaster= new THREE.Raycaster();
     let mouse = new THREE.Vector2();
@@ -760,7 +782,6 @@ function onMouseClick(x, z, fn, event ) {
     // 获取raycaster直线和所有模型相交的数组集合
     var intersects = raycaster.intersectObjects( scene.children );
     
-    // console.log(intersects[0].object.uuid);
     // console.log(JSON.parse(JSON.stringify(meshEnd)).object.uuid)
     const clickUuid = intersects[0].object.uuid;
     const meshEndUuid = JSON.parse(JSON.stringify(meshEnd)).object.uuid;
@@ -948,17 +969,14 @@ $('.search-btn').click(function() {
              */
             loadStartImg(startPathX, startPathZ)
             loadEndImg(position[0], position[1], function() {
-                alert(startPathX);
-                alert(startPathZ)
                 $('.serach').hide();
                 axes(startPathX, startPathZ, position[0], position[1], function(result) {
-                    alert('执行事件')
                     $('.distance').show();
                     $('.head').show().find('span').html('退出导航');
                     $('.title').html('');
                     $('.title').append(`
                     <span>${name}</span>
-                    <span>${result.routes[0].distance}.${Math.ceil(Math.random()*10)}米</span>`)
+                    <span>${result}.${Math.ceil(Math.random()*10)}米</span>`)
                 })
             });
         })
@@ -1023,7 +1041,7 @@ if (nearby) {
              * 显示终点坐标
              */
             loadEndImg(position[0], position[1], function() {
-                axes(CalculationX(startPathX), CalculationZ(startPathZ), position[0], position[1])
+                axes(startPathX, startPathZ, position[0], position[1])
             });
         })
     })
@@ -1041,7 +1059,7 @@ if (position) {
      */
     loadEndImg(positions[0], positions[1], function() {
         $('.serach').hide();
-        axes(CalculationX(startPathX), CalculationZ(startPathZ), positions[0], positions[1])
+        axes(startPathX, startPathZ, positions[0], positions[1])
     });
 }
 
@@ -1054,7 +1072,7 @@ if(startCenter && endCenter) {
     const startCenterArr = startCenter.split(',');
     const endCenterArr = endCenter.split(',');
     // 加载终点和起点坐标 并且画线
-    loadStartImg(startCenterArr[0],startCenterArr[1])
+    loadStartImg(CalculationX(startCenterArr[0]), Calculation(startCenterArr[1]))
     loadEndImg(endCenterArr[0], endCenterArr[1])
     axes(startCenterArr[0],startCenterArr[1], endCenterArr[0], endCenterArr[1])
 }
@@ -1083,8 +1101,8 @@ function geolocation () {
 function onComplete(data) {
     if(data.position) {
         const initPosition = JSON.parse(JSON.stringify(data.position));
-        startPathX = 116.643804 < initPosition.lng && initPosition.lng <116.650751 ? initPosition.lng : 116.648653;
-        startPathZ = 39.921923 < initPosition.lat && initPosition.lat < 39.919047 ? initPosition.lat : 39.921664;
+        startPathX = 116.643804 < initPosition.lng && initPosition.lng <116.650751 ? CalculationX(initPosition.lng) : CalculationX(116.648653);
+        startPathZ = 39.921923 < initPosition.lat && initPosition.lat < 39.919047 ? CalculationZ(initPosition.lat) : CalculationZ(39.921664);
         /*
         var str = [];
         str.push('定位结果：' + data.position);
@@ -1108,11 +1126,11 @@ function onComplete(data) {
 function onError(data) {
     // alert(JSON.stringify(data))
     if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
-        // 116.648653,39.921664
+        // 116.648653,39.921664 
         mesh.position.x = CalculationX(116.648653);
         mesh.position.z = CalculationZ(39.921664);
     }
-    console.log(data)
+    // console.log(data)
 }
 $(".service").click(function(){
     $(".service-container").show();
@@ -1224,7 +1242,7 @@ $(".activity-title").click(function() {
                         const endCenterArr = center.split(',');
                         loadStartImg(CalculationX(startPathX), CalculationZ(startPathZ))
                         loadEndImg(endCenterArr[0], endCenterArr[1])
-                        axes(CalculationX(startPathX), CalculationZ(startPathZ), endCenterArr[0], endCenterArr[1])
+                        axes(startPathX, startPathZ, endCenterArr[0], endCenterArr[1])
                     })                        
                     
                 })
