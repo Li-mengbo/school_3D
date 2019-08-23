@@ -5,7 +5,8 @@ import $ from 'jquery';
 let mapList;
 // 获取模糊查询信息
 $.ajax({ 
-    url: `${process.env.BASE_API}school-map/sitePosition/getAll`, 
+    // ${process.env.BASE_API}
+    url: `http://47.92.118.208/school-map/sitePosition/getAll`, 
     success: function(res){
         console.log('模糊查询',res)
         if(res.code == 200) {
@@ -45,7 +46,8 @@ $.ajax({
                 const that = this;
                 // 获取坐标
                 $.ajax({ 
-                    url: `${process.env.BASE_API}school-map/sitePosition/getByName?name=${name}`, 
+                    // ${process.env.BASE_API}
+                    url: `http://47.92.118.208/school-map/sitePosition/getByName?name=${name}`, 
                     success: function(res){
                         console.log('获取坐标',res)
                         if(res.code == 200) {

@@ -251,7 +251,8 @@ function initContent() {
             });
         }else {
             loader = new THREE.GLTFLoader();
-            loader.load(`${process.env.BASE_API}School/${item.name}/${item.name}.gltf`, function (obj) {
+            //  ${process.env.BASE_API}
+            loader.load(`http://47.92.118.208:8081/School/${item.name}/${item.name}.gltf`, function (obj) {
                 console.log(`模型返回值=====${item.name}`,obj)
                 let gltfChildren = obj.scene.children;
                 let scales = [];
@@ -316,7 +317,8 @@ function initContent() {
 function initBg() {
     var skyBoxGeometry1 = new THREE.PlaneGeometry(78, 39, 1); 
     for(let i = 1, n = 5; i <= n; i++) {
-        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}schoolatlas/0${i}.png`);
+        // ${process.env.BASE_API}
+        var texture = new THREE.TextureLoader().load(`http://47.92.118.208:8081/schoolatlas/0${i}.png`);
         var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
@@ -330,7 +332,8 @@ function initBg() {
     }
     var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1); 
     for(let i = 1, n = 4; i <= n; i++) {
-        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}schoolatlas/m0${i}.png`);
+        // ${process.env.BASE_API}
+        var texture = new THREE.TextureLoader().load(`http://47.92.118.208:8081/schoolatlas/m0${i}.png`);
         var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
@@ -359,7 +362,8 @@ function makeSkybox() {
     for (var i = 0; i < 6; i++)
         materialArray.push( new THREE.MeshBasicMaterial({
             //这里imagePrefix + directions[i] + imageSuffix 就是将图片路径弄出来
-            map: new THREE.TextureLoader().load(`${process.env.BASE_API}skybox/${directions[i]}.png`),
+            // ${process.env.BASE_API}
+            map: new THREE.TextureLoader().load(`http://47.92.118.208:8081/skybox/${directions[i]}.png`),
             side: THREE.BackSide  //因为这里我们的场景是在天空盒的里面，所以这里设置为背面应用该材质
         }));
 
@@ -882,7 +886,8 @@ function animate() {
 let mapList = [];
 // 获取模糊查询信息
 $.ajax({ 
-    url: `${process.env.BASE_API}school-map/sitePosition/getAll`, 
+    // ${process.env.BASE_API}
+    url: `http://47.92.118.208/school-map/sitePosition/getAll`, 
     success: function(res){
         console.log('模糊查询',res)
         if(res.code == 200) {
@@ -917,7 +922,8 @@ if (center) {
     $('.menu').hide();
     $('.footer').hide();
     $.ajax({ 
-        url: `${process.env.BASE_API}school-map/quanjing/getAll`, 
+        // ${process.env.BASE_API}
+        url: `http://47.92.118.208/school-map/quanjing/getAll`, 
         success: function(res){
             console.log('全景图',res)
             if(res.code == 200) {
@@ -1002,7 +1008,8 @@ if (nearby) {
         return new Promise(function(resolve, reject){
             // 获取周边详细信息
             $.ajax({ 
-                url: `${process.env.BASE_API}school-map/circum/getByTypeId?typeId=${nearby}`, 
+                // ${process.env.BASE_API}
+                url: `http://47.92.118.208/school-map/circum/getByTypeId?typeId=${nearby}`, 
                 success: function(res){
                     console.log('周边详细信息',res)
                     if(res.code == 200) {
@@ -1072,9 +1079,9 @@ if(startCenter && endCenter) {
     const startCenterArr = startCenter.split(',');
     const endCenterArr = endCenter.split(',');
     // 加载终点和起点坐标 并且画线
-    loadStartImg(CalculationX(startCenterArr[0]), Calculation(startCenterArr[1]))
+    loadStartImg(CalculationX(startCenterArr[0]), CalculationZ(startCenterArr[1]))
     loadEndImg(endCenterArr[0], endCenterArr[1])
-    axes(startCenterArr[0],startCenterArr[1], endCenterArr[0], endCenterArr[1])
+    axes(CalculationX(startCenterArr[0]),CalculationZ(startCenterArr[1]), endCenterArr[0], endCenterArr[1])
 }
 // 地图定位
 function geolocation () {
@@ -1101,8 +1108,8 @@ function geolocation () {
 function onComplete(data) {
     if(data.position) {
         const initPosition = JSON.parse(JSON.stringify(data.position));
-        startPathX = 116.643804 < initPosition.lng && initPosition.lng <116.650751 ? CalculationX(initPosition.lng) : CalculationX(116.648653);
-        startPathZ = 39.921923 < initPosition.lat && initPosition.lat < 39.919047 ? CalculationZ(initPosition.lat) : CalculationZ(39.921664);
+        startPathX = 116.643804 < initPosition.lng && initPosition.lng <116.650751 ? CalculationX(initPosition.lng) : CalculationX(116.648592);
+        startPathZ = 39.921923 < initPosition.lat && initPosition.lat < 39.919047 ? CalculationZ(initPosition.lat) : CalculationZ(39.921754);
         /*
         var str = [];
         str.push('定位结果：' + data.position);
@@ -1113,7 +1120,7 @@ function onComplete(data) {
         str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
         document.getElementById('weizhi').innerHTML =  str.join('<br>') + '您的位置：'+startPathX+',<br/>'+startPathZ +'<br/>' +CalculationX(startPathX)+'<br/>' +CalculationZ(startPathZ);
         */
-        if(controlsFlag == 'pingmian') {
+        if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
             mesh.position.x = CalculationX(startPathX);
             mesh.position.z = CalculationZ(startPathZ);
         }
@@ -1126,10 +1133,13 @@ function onComplete(data) {
 function onError(data) {
     // alert(JSON.stringify(data))
     if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
-        // 116.648653,39.921664 
-        mesh.position.x = CalculationX(116.648653);
-        mesh.position.z = CalculationZ(39.921664);
+        // 116.648653,39.921664 116.648592, 39.921754
+        mesh.position.x = CalculationX(116.648592);
+        mesh.position.z = CalculationZ(39.921754);
     }
+    if(controlsFlag == 'renwu') {
+        camera.position.set(CalculationX(116.648592), .18, CalculationZ(39.921754))
+    } 
     // console.log(data)
 }
 $(".service").click(function(){
@@ -1146,7 +1156,8 @@ $(".activity-title").click(function() {
     const index = $(this).parent('.activity').attr('data-index');
     const flag = $(this).parent('.activity').attr('data-flag');
     $.ajax({ 
-        url: `${process.env.BASE_API}school-map/serviceInfo/getByType?type=${index}`, 
+        // ${process.env.BASE_API}
+        url: `http://47.92.118.208/school-map/serviceInfo/getByType?type=${index}`, 
         success: function(res){
             if(res.code == 200) {
                 const schoolList = res.data;
