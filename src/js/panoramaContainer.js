@@ -4,7 +4,7 @@ import $ from 'jquery';
 
 $.ajax({ 
     // ${process.env.BASE_API}
-    url: `http://47.92.118.208/school-map/quanjing/getAll`, 
+    url: `${process.env.BASE_API}school-map/quanjing/getAll`, 
     success: function(res){
         if(res.code == 200) {
             res.data.forEach(item => {

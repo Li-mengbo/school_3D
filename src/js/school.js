@@ -7,7 +7,7 @@ $('.item').click(function () {
     const index = $(this).attr('data-index')
     $.ajax({ 
         // ${process.env.BASE_API}
-        url: `http://47.92.118.208/school-map/schoolInfo/getByType?type=${index}`, 
+        url: `${process.env.BASE_API}school-map/schoolInfo/getByType?type=${index}`, 
         success: function(res){
             console.log('校园查询',res)
             if(res.code == 200) {
@@ -110,7 +110,7 @@ $(".activity-title").click(function() {
     const flag = $(this).parent('.activity').attr('data-flag');
     $.ajax({ 
         // ${process.env.BASE_API}
-        url: `http://47.92.118.208/school-map/schoolInfo/getByType?type=${index}`, 
+        url: `${process.env.BASE_API}school-map/schoolInfo/getByType?type=${index}`, 
         success: function(res){
             console.log('校园查询',res)
             let schoolList = [];

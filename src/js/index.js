@@ -208,6 +208,7 @@ function initContent() {
     // 分批加载资源
     loadGltf.forEach((item, index) => {
         //  Files
+        /*
         if(storageDB) {
             const request = indexedDB.open('worldDB', 1);
 
@@ -251,13 +252,15 @@ function initContent() {
             });
         }else {
             loader = new THREE.GLTFLoader();
-            //  ${process.env.BASE_API}
-            loader.load(`http://47.92.118.208:8081/School/${item.name}/${item.name}.gltf`, function (obj) {
+            //  
+            loader.load(`${process.env.BASE_API}3dschool/School/${item.name}/${item.name}.gltf`, function (obj) {
                 console.log(`模型返回值=====${item.name}`,obj)
                 let gltfChildren = obj.scene.children;
                 let scales = [];
                 let positions = [];
                 let rotations = [];
+                let meshGeometry = [];
+                let meshMaterial = [];
                 let meshs = [];
                 gltfChildren.forEach(items => {
                     const scale = JSON.parse(JSON.stringify(items.scale));
@@ -276,29 +279,21 @@ function initContent() {
                     scales.push(scale);
                     positions.push(position);
                     rotations.push(rotation);
-                    meshs.push(mesh);
+                    // meshGeometry.push(items.geometry);
+                    // meshMaterial.push(items.material);
+                    meshs.push(mesh)
                     scene.add(mesh);
                 })
                 doSomethingToDb('worldDB', 1, 'Files', {
                     "filename": item.name,
                     "id": index,
                     "content": JSON.stringify(meshs),
+                    // "contentGeometry": JSON.stringify(meshGeometry),
+                    // "meshMaterial": JSON.stringify(meshMaterial),
                     "position": JSON.stringify(positions),
                     "scale": JSON.stringify(scales),
                     "rotation": JSON.stringify(rotations)
                 })
-                    // console.log(mesh)                
-                /*简便加载gltf模型*/
-                /*
-                var object = obj.scene
-                // 修改位置坐标
-                object.position.y = 0;
-                object.position.x = 0;
-                object.position.z = 0;
-                scene.add(object);
-                */
-
-        
             }, function (xhr) {
         
                 console.log((xhr.loaded / xhr.total * 100) + '% loaded');
@@ -309,6 +304,28 @@ function initContent() {
         
             })
         }
+        */
+        loader = new THREE.GLTFLoader();
+        loader.load(`http://47.92.118.208:8081/School/${item.name}/${item.name}.gltf`, function (obj) {              
+            /*简便加载gltf模型*/
+            var object = obj.scene
+            // 修改位置坐标
+            object.position.y = 0;
+            object.position.x = 0;
+            object.position.z = 0;
+            scene.remove(object)
+            scene.add(object);
+
+    
+        }, function (xhr) {
+    
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    
+        }, function (error) {
+    
+            console.log('load error!' + error.getWebGLErrorMessage());
+    
+        })
     })
 
 }
@@ -318,7 +335,7 @@ function initBg() {
     var skyBoxGeometry1 = new THREE.PlaneGeometry(78, 39, 1); 
     for(let i = 1, n = 5; i <= n; i++) {
         // ${process.env.BASE_API}
-        var texture = new THREE.TextureLoader().load(`http://47.92.118.208:8081/schoolatlas/0${i}.png`);
+        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}/3dschool/schoolatlas/0${i}.png`);
         var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
@@ -333,7 +350,7 @@ function initBg() {
     var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1); 
     for(let i = 1, n = 4; i <= n; i++) {
         // ${process.env.BASE_API}
-        var texture = new THREE.TextureLoader().load(`http://47.92.118.208:8081/schoolatlas/m0${i}.png`);
+        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/m0${i}.png`);
         var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
@@ -363,7 +380,7 @@ function makeSkybox() {
         materialArray.push( new THREE.MeshBasicMaterial({
             //这里imagePrefix + directions[i] + imageSuffix 就是将图片路径弄出来
             // ${process.env.BASE_API}
-            map: new THREE.TextureLoader().load(`http://47.92.118.208:8081/skybox/${directions[i]}.png`),
+            map: new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/skybox/${directions[i]}.png`),
             side: THREE.BackSide  //因为这里我们的场景是在天空盒的里面，所以这里设置为背面应用该材质
         }));
 
@@ -887,7 +904,7 @@ let mapList = [];
 // 获取模糊查询信息
 $.ajax({ 
     // ${process.env.BASE_API}
-    url: `http://47.92.118.208/school-map/sitePosition/getAll`, 
+    url: `${process.env.BASE_API}school-map/sitePosition/getAll`, 
     success: function(res){
         console.log('模糊查询',res)
         if(res.code == 200) {
@@ -923,7 +940,7 @@ if (center) {
     $('.footer').hide();
     $.ajax({ 
         // ${process.env.BASE_API}
-        url: `http://47.92.118.208/school-map/quanjing/getAll`, 
+        url: `${process.env.BASE_API}school-map/quanjing/getAll`, 
         success: function(res){
             console.log('全景图',res)
             if(res.code == 200) {
@@ -1009,7 +1026,7 @@ if (nearby) {
             // 获取周边详细信息
             $.ajax({ 
                 // ${process.env.BASE_API}
-                url: `http://47.92.118.208/school-map/circum/getByTypeId?typeId=${nearby}`, 
+                url: `${process.env.BASE_API}school-map/circum/getByTypeId?typeId=${nearby}`, 
                 success: function(res){
                     console.log('周边详细信息',res)
                     if(res.code == 200) {
@@ -1157,7 +1174,7 @@ $(".activity-title").click(function() {
     const flag = $(this).parent('.activity').attr('data-flag');
     $.ajax({ 
         // ${process.env.BASE_API}
-        url: `http://47.92.118.208/school-map/serviceInfo/getByType?type=${index}`, 
+        url: `${process.env.BASE_API}school-map/serviceInfo/getByType?type=${index}`, 
         success: function(res){
             if(res.code == 200) {
                 const schoolList = res.data;
@@ -1270,7 +1287,7 @@ $('.daohang').click(function () {
 })
 // 视角切换
 $('.3D').click(function () {
-    window.location.href = './index.html?controlsFlag=3d';  
+    window.location.href = './index.html?controlsFlag=3d';
 })
 $('.pingmian').click(function () {
     window.location.href = './index.html?controlsFlag=pingmian';  

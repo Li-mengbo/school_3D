@@ -6,7 +6,7 @@ let mapList;
 // 获取模糊查询信息
 $.ajax({ 
     // ${process.env.BASE_API}
-    url: `http://47.92.118.208/school-map/sitePosition/getAll`, 
+    url: `${process.env.BASE_API}school-map/sitePosition/getAll`, 
     success: function(res){
         console.log('模糊查询',res)
         if(res.code == 200) {
@@ -47,7 +47,7 @@ $.ajax({
                 // 获取坐标
                 $.ajax({ 
                     // ${process.env.BASE_API}
-                    url: `http://47.92.118.208/school-map/sitePosition/getByName?name=${name}`, 
+                    url: `${process.env.BASE_API}school-map/sitePosition/getByName?name=${name}`, 
                     success: function(res){
                         console.log('获取坐标',res)
                         if(res.code == 200) {
