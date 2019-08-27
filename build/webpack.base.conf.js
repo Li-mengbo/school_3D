@@ -106,7 +106,7 @@ var config = {
     devServer: {
       proxy: {
         '/api': {
-          target: 'http://wxy.bjczy.edu.cn:8067/',
+          target: 'http://wxy.bjczy.edu.cn:8065/',
           pathRewrite: {'^/api' : ''},
           changeOrigin: true,     // target是域名的话，需要这个参数，
           secure: true,          // 设置支持https协议的代理

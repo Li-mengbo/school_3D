@@ -93,11 +93,32 @@ startPathX = CalculationX(116.648592);
 startPathZ = CalculationZ(39.921754);
 // 默认为地三人称相机
 controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
+// 性能插件
+let stats = initStats();
 
 /* 创建场景 */
 function initScene() {
     scene = new THREE.Scene();
 }
+
+/* 性能插件 */
+function initStats() {
+
+    let stats = new Stats();
+
+    document.body.appendChild(stats.domElement);
+
+    return stats;
+
+}
+
+/* 数据更新 */
+function update() {
+
+    stats.update();
+
+}
+
 
 /* 相机 */
 function initCamera() {
@@ -306,7 +327,7 @@ function initContent() {
         }
         */
         loader = new THREE.GLTFLoader();
-        loader.load(`http://47.92.118.208:8081/School/${item.name}/${item.name}.gltf`, function (obj) {              
+        loader.load(`${process.env.BASE_API}3dschool/School/${item.name}/${item.name}.gltf`, function (obj) {              
             /*简便加载gltf模型*/
             var object = obj.scene
             // 修改位置坐标
@@ -869,9 +890,9 @@ function init() {
 var clock = new THREE.Clock();
 /* 循环渲染 */
 function animate() {
-    controls.update(clock.getDelta());
     requestAnimationFrame(animate);
     if(controlsFlag == 'manyou') {
+        controls.update(clock.getDelta());
         if(progress>1.0){
             return;    //停留在管道末端,否则会一直跑到起点 循环再跑
         }
@@ -886,7 +907,7 @@ function animate() {
         }
     }
     renderer.render(scene, camera);
-
+    update();
 }
 
 /* 初始加载 */
@@ -1138,11 +1159,11 @@ function onComplete(data) {
         document.getElementById('weizhi').innerHTML =  str.join('<br>') + '您的位置：'+startPathX+',<br/>'+startPathZ +'<br/>' +CalculationX(startPathX)+'<br/>' +CalculationZ(startPathZ);
         */
         if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
-            mesh.position.x = CalculationX(startPathX);
-            mesh.position.z = CalculationZ(startPathZ);
+            mesh.position.x = startPathX;
+            mesh.position.z = startPathZ;
         }
         if(controlsFlag == 'renwu') {
-            camera.position.set(CalculationX(startPathX), .18, CalculationZ(startPathZ))
+            camera.position.set(startPathX, .18, startPathZ)
         } 
     }
 }
