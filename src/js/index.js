@@ -94,7 +94,7 @@ startPathZ = CalculationZ(39.921754);
 // 默认为地三人称相机
 controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 // 性能插件
-let stats = initStats();
+// let stats = initStats();
 
 /* 创建场景 */
 function initScene() {
@@ -750,7 +750,7 @@ function loadEndImg(x, z, fn) {
     meshEnd.position.x = clickX;
     meshEnd.position.z = clickZ;
     scene.add(meshEnd);
-    window.addEventListener( 'click', onMouseClick.bind(window, fn), false );
+    document.addEventListener( 'click', onMouseClick.bind(window, fn), false );
 }
 /**
  * 把点击事件放到最外边获取点击的坐标
@@ -824,7 +824,7 @@ function onMouseClick(fn, event ) {
     // 获取raycaster直线和所有模型相交的数组集合
     var intersects = raycaster.intersectObjects( scene.children );
     
-    // console.log(JSON.parse(JSON.stringify(meshEnd)).object.uuid)
+    console.log(JSON.parse(JSON.stringify(meshEnd)).object, intersects[0])
     const clickUuid = intersects[0].object.uuid;
     const meshEndUuid = JSON.parse(JSON.stringify(meshEnd)).object.uuid;
     // console.log(clickUuid ==  meshEndUuid)
@@ -907,7 +907,7 @@ function animate() {
         }
     }
     renderer.render(scene, camera);
-    update();
+    // update();
 }
 
 /* 初始加载 */
@@ -1011,7 +1011,7 @@ $('.search-btn').click(function() {
             /**
              * 执行加载终点坐标方法绘制点并且导航
              */
-            loadStartImg(startPathX, startPathZ)
+            loadStartImg(startPathX, startPathZ);
             loadEndImg(position[0], position[1], function() {
                 $('.serach').hide();
                 axes(startPathX, startPathZ, position[0], position[1], function(result) {
@@ -1165,6 +1165,7 @@ function onComplete(data) {
         if(controlsFlag == 'renwu') {
             camera.position.set(startPathX, .18, startPathZ)
         } 
+        $(".amap-geolocation-con").remove()
     }
 }
 //解析定位错误信息
@@ -1178,6 +1179,7 @@ function onError(data) {
     if(controlsFlag == 'renwu') {
         camera.position.set(CalculationX(116.648592), .18, CalculationZ(39.921754))
     } 
+    $(".amap-geolocation-con").remove()
     // console.log(data)
 }
 $(".service").click(function(){
@@ -1334,4 +1336,6 @@ function orientationHandler(event) {
     }
     // mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
 }
+console.log($('.amap-geolocation-con'))
+$('.amap-geo').hide();
 
