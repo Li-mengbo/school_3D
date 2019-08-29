@@ -690,8 +690,10 @@ function onWindowResize() {
 function loadImg() {
     /* 中心点坐标轴辅助线 */
     /*
+    
     var axes = new THREE.AxisHelper(10);
     scene.add(axes);
+
     */
     // 需要改为定位获取
     const x = startPathX;
@@ -746,7 +748,7 @@ function loadEndImg(x, z, fn) {
         transparent: true
     });
     meshEnd = new THREE.Mesh(skyBoxGeometry, material);
-    meshEnd.position.y = 2.5;
+    meshEnd.position.y = 8;
     meshEnd.position.x = clickX;
     meshEnd.position.z = clickZ;
     scene.add(meshEnd);

@@ -39,7 +39,7 @@ export function fuzzyQuery(list, keyWord) {
   *@return 基于模型的Z坐标点
   */
  export function CalculationZ(z) {
-    const a = (-14.468876566816704 - 12.540611062989646) / (39.92165992 - 39.91972215);            
+    const a = (-14.468876566816704 - 10.040611062989646) / (39.92165992 - 39.91972215);            
     const b = (-14.468876566816704 - 39.92165992 * a);
     return a * z + b;
 }
