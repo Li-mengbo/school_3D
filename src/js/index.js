@@ -4,8 +4,10 @@ import { GetQueryString, fuzzyQuery, CalculationX, CalculationZ, unid, erwei } f
 import loadGltf from '../utils/loadGltf';
 import $ from 'jquery';
 import arrJson from '../utils/test.json';
+// alert(navigator.userAgent)
 console.log(process.env.BASE_API)
 /*缓存数据*/
+/*
 function openDB (dbName, version, storeName) {
     return new Promise((resolve, reject) => {
       const indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
@@ -46,6 +48,7 @@ function doSomethingToDb (dbName, version, storeName, data) {
         console.error(err)
       })
 }
+*/
   
 
 /* 地图路线绘制 */
@@ -83,18 +86,14 @@ const startCenter = GetQueryString('startCenter');
 const endCenter = GetQueryString('endCenter');
 const position = GetQueryString('position');
 // 是否缓存
-const storageDB = localStorage.getItem('storageDB')
-// 导航初始值
-let initCenter = [116.648432,39.92166];
-//导航结束值
-let endPosition = [];
+// const storageDB = localStorage.getItem('storageDB')
 /* 初始坐标在北门 */
 startPathX = CalculationX(116.648592);
 startPathZ = CalculationZ(39.921754);
 // 默认为地三人称相机
 controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 // 性能插件
-// let stats = initStats();
+let stats = initStats();
 
 /* 创建场景 */
 function initScene() {
@@ -106,7 +105,7 @@ function initStats() {
 
     let stats = new Stats();
 
-    document.body.appendChild(stats.domElement);
+    // document.body.appendChild(stats.domElement);
 
     return stats;
 
@@ -162,10 +161,10 @@ function initRender() {
 
 /* 灯光 */
 function initLight() {
-  let light = 1;
-  if (storageDB) {
-    light = 0.6;
-  }
+  let light = 1.2;
+//   if (storageDB) {
+//     light = 0.6;
+//   }
   // 半球光就是渐变的光；
   // 第一个参数是天空的颜色，第二个参数是地上的颜色，第三个参数是光源的强度
   var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, light);
@@ -334,7 +333,6 @@ function initContent() {
             object.position.y = 0;
             object.position.x = 0;
             object.position.z = 0;
-            scene.remove(object)
             scene.add(object);
 
     
@@ -653,7 +651,6 @@ function axes(startLon, startLat, endLon,endLat, fn) {
         // 给空白几何体添加点信息，这里写3个点，geometry会把这些点自动组合成线，面。
         geometry.vertices.push(new THREE.Vector3(item[0], .2, item[1]));
     })
-    console.log(pathArr)
     //线构造
     var line=new THREE.Line(geometry,material);
     // 加入到场景中
@@ -706,7 +703,7 @@ function loadImg() {
             transparent: true
     });
     mesh = new THREE.Mesh(skyBoxGeometry, material);
-    mesh.position.y = 0.8;
+    mesh.position.y = 0.2;
     mesh.position.x = x;
     mesh.position.z = z;
     mesh.rotation.x += -0.5 * Math.PI;
@@ -893,8 +890,8 @@ var clock = new THREE.Clock();
 /* 循环渲染 */
 function animate() {
     requestAnimationFrame(animate);
+    controls.update(clock.getDelta());
     if(controlsFlag == 'manyou') {
-        controls.update(clock.getDelta());
         if(progress>1.0){
             return;    //停留在管道末端,否则会一直跑到起点 循环再跑
         }
@@ -909,7 +906,7 @@ function animate() {
         }
     }
     renderer.render(scene, camera);
-    // update();
+    update();
 }
 
 /* 初始加载 */
@@ -1165,6 +1162,7 @@ function onComplete(data) {
             mesh.position.z = startPathZ;
         }
         if(controlsFlag == 'renwu') {
+            console.log('=============',startPathX, startPathZ)
             camera.position.set(startPathX, .18, startPathZ)
         } 
         $(".amap-geolocation-con").remove()
@@ -1338,6 +1336,5 @@ function orientationHandler(event) {
     }
     // mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
 }
-console.log($('.amap-geolocation-con'))
 $('.amap-geo').hide();
 
