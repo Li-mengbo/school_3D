@@ -1,3 +1,12 @@
+// 模型是否加载完毕
+const gltfEnd = localStorage.getItem('gltfEnd');
+if(!gltfEnd) {
+    $('#container').append(`
+    <div id="loading">
+        <div class="load-test">校园地图正在玩命加载中。。。。请稍等</div>
+    </div>
+    `);
+}
 import '../style/index';
 import '../style/style';
 import { GetQueryString, fuzzyQuery, CalculationX, CalculationZ, unid, erwei } from '../utils/util';
@@ -6,51 +15,6 @@ import $ from 'jquery';
 import arrJson from '../utils/test.json';
 // alert(navigator.userAgent)
 console.log(process.env.BASE_API)
-/*缓存数据*/
-/*
-function openDB (dbName, version, storeName) {
-    return new Promise((resolve, reject) => {
-      const indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
-      const request = indexedDB.open(dbName, version)
-      request.onsuccess = function (e) {
-        resolve(e.target.result)
-      } 
-      request.onerror = function (e) {
-        reject(e)
-      } 
-      request.onupgradeneeded = function (e) {
-        const db = e.target.result
-        if (!db.objectStoreNames.contains(storeName)) {
-          const objectStore = db.createObjectStore(storeName, {
-            keyPath: 'id',
-            autoIncrement: true
-          })
-          objectStore.createIndex('index', 'filename', {
-            unique: false
-          })
-          localStorage.setItem('storageDB', true);
-        }
-      } 
-    })
-}
-
-function doSomethingToDb (dbName, version, storeName, data) {
-    openDB(dbName, version, storeName)
-      .then(db => {
-        const tx = db.transaction(storeName, 'readwrite')
-        const store = tx.objectStore(storeName)
-        const req = store.put(data)
-        req.onsuccess = res => {
-          console.log('保存成功', res)
-        } 
-      })
-      .catch(err => {
-        console.error(err)
-      })
-}
-*/
-  
-
 /* 地图路线绘制 */
 const map = new AMap.Map("mapBox", {
     viewMode:'3D',
@@ -93,8 +57,7 @@ startPathZ = CalculationZ(39.921754);
 // 默认为地三人称相机
 controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 // 性能插件
-let stats = initStats();
-
+// let stats = initStats();
 /* 创建场景 */
 function initScene() {
     scene = new THREE.Scene();
@@ -138,7 +101,7 @@ function initCamera() {
         geolocation();
         setInterval(function() {
             geolocation(); 
-        },2000)
+        },5000)
     }else if(controlsFlag == 'manyou') {
         const manyouPathX = CalculationX(116.64861023);
         const manyouPathZ = CalculationZ(39.92165992);
@@ -186,6 +149,7 @@ function initLight() {
     scene.add(ambientLight);
     scene.add(hemisphereLight);  
     scene.add(shadowLight);
+    timeRender();
 }
 
 /* 
@@ -219,112 +183,17 @@ function initControls() {
         controls.lon = 90;
     }
 }
-
+// 模型加载个数初始值
+let gltfNum = 0;
 /* 场景中的内容加载gltf格式也可以换成其他格式*/
 function initContent() {
-
+    console.log('模型个数',loadGltf.length)
+    const gltfLength = loadGltf.length;
     // 加载 glTF 格式的模型
     let loader; /*实例化加载器*/
     // 分批加载资源
     loadGltf.forEach((item, index) => {
         //  Files
-        /*
-        if(storageDB) {
-            const request = indexedDB.open('worldDB', 1);
-
-            request.addEventListener('success', e => {
-                const db = e.target.result;
-                const tx = db.transaction('Files','readwrite');
-    
-                const store = tx.objectStore('Files');
-    
-                // 获取数据
-                const reqGet = store.get(index);
-    
-                reqGet.addEventListener('success', e => {
-                    if(!reqGet.result) {
-                        return false;
-                    }
-                    // console.log('--------------------------------------------', reqGet.result);
-                    const content = JSON.parse(reqGet.result.content);
-                    const position = JSON.parse(reqGet.result.position);
-                    const rotation = JSON.parse(reqGet.result.rotation);
-                    const scale = JSON.parse(reqGet.result.scale);
-                    // console.log(content)
-                    content.forEach((items, index) => {
-                        loader = new THREE.ObjectLoader();
-                        loader.parse(items, function(e) {
-                            
-                            var mesh = new THREE.Mesh( e.geometry, e.material );
-                            // 修改大小
-                            mesh.scale.set(scale[index].x, scale[index].y, scale[index].z)
-                            // 定义旋转
-                            mesh.rotation.set(rotation[index]._x, rotation[index]._y, rotation[index]._z);
-                            // 修改位置坐标
-                            mesh.position.y = position[index].y;
-                            mesh.position.x = position[index].x;
-                            mesh.position.z = position[index].z;
-                            scene.add( mesh );
-                        }, '.');
-                    })
- 
-                })
-            });
-        }else {
-            loader = new THREE.GLTFLoader();
-            //  
-            loader.load(`${process.env.BASE_API}3dschool/School/${item.name}/${item.name}.gltf`, function (obj) {
-                console.log(`模型返回值=====${item.name}`,obj)
-                let gltfChildren = obj.scene.children;
-                let scales = [];
-                let positions = [];
-                let rotations = [];
-                let meshGeometry = [];
-                let meshMaterial = [];
-                let meshs = [];
-                gltfChildren.forEach(items => {
-                    const scale = JSON.parse(JSON.stringify(items.scale));
-                    const position = JSON.parse(JSON.stringify(items.position));
-                    const rotation = JSON.parse(JSON.stringify(items.rotation));
-                    var mesh = new THREE.Mesh( items.geometry, items.material );
-                    // console.log(`模型返回值=====${item.name}`,JSON.parse(JSON.stringify(items)))
-                    // 定义大小
-                    mesh.scale.set(scale.x, scale.y, scale.z);
-                    // 定义旋转
-                    mesh.rotation.set(rotation._x, rotation._y, rotation._z);
-                    // 修改位置坐标
-                    mesh.position.y = position.y;
-                    mesh.position.x = position.x;
-                    mesh.position.z = position.z;
-                    scales.push(scale);
-                    positions.push(position);
-                    rotations.push(rotation);
-                    // meshGeometry.push(items.geometry);
-                    // meshMaterial.push(items.material);
-                    meshs.push(mesh)
-                    scene.add(mesh);
-                })
-                doSomethingToDb('worldDB', 1, 'Files', {
-                    "filename": item.name,
-                    "id": index,
-                    "content": JSON.stringify(meshs),
-                    // "contentGeometry": JSON.stringify(meshGeometry),
-                    // "meshMaterial": JSON.stringify(meshMaterial),
-                    "position": JSON.stringify(positions),
-                    "scale": JSON.stringify(scales),
-                    "rotation": JSON.stringify(rotations)
-                })
-            }, function (xhr) {
-        
-                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-        
-            }, function (error) {
-        
-                console.log('load error!' + error.getWebGLErrorMessage());
-        
-            })
-        }
-        */
         loader = new THREE.GLTFLoader();
         loader.load(`${process.env.BASE_API}3dschool/School/${item.name}/${item.name}.gltf`, function (obj) {              
             /*简便加载gltf模型*/
@@ -334,10 +203,16 @@ function initContent() {
             object.position.x = 0;
             object.position.z = 0;
             scene.add(object);
-
+            gltfNum++
+            if(gltfNum == gltfLength) {
+                $('#loading').hide();
+                localStorage.setItem('gltfEnd', true); 
+            }
+            console.log('mocing',gltfNum)
+            timeRender();
     
         }, function (xhr) {
-    
+
             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
     
         }, function (error) {
@@ -365,6 +240,7 @@ function initBg() {
         meshBg.position.z = 0;
         meshBg.rotation.x += -0.5 * Math.PI;
         scene.add(meshBg);
+        timeRender();
     }
     var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1); 
     for(let i = 1, n = 4; i <= n; i++) {
@@ -380,6 +256,7 @@ function initBg() {
         meshBg.position.z = 2;
         meshBg.rotation.x += -0.5 * Math.PI;
         scene.add(meshBg);
+        timeRender();
     }    
 }
 
@@ -411,6 +288,7 @@ function makeSkybox() {
     sky.position.y = 0;
     //场景当中加入天空盒
     scene.add( sky );
+    timeRender();
 }
 
 /** 
@@ -555,7 +433,8 @@ function initGround() {
 			opacity: 1
 		}));
 		line.position.z = (i * 10 / 25) - length / 50;
-		scene.add(line);
+        scene.add(line);
+        timeRender();
 
 		var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
 			color: 0x808080,
@@ -563,7 +442,8 @@ function initGround() {
 		}));
 		line.position.x = (i * 10 / 25) - length / 50;
 		line.rotation.y = 90 * Math.PI / 180;
-		scene.add(line);
+        scene.add(line);
+        timeRender();
 
 	}
 	var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
@@ -572,7 +452,8 @@ function initGround() {
 		side: THREE.BackSide
 	});
 	var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
-	scene.add(skyBox);
+    scene.add(skyBox);
+    timeRender();
 
 }
 
@@ -594,7 +475,7 @@ function initGrid() {
                 var cube = new THREE.Mesh( geometry, material );
                 cube.position.set((i-100)*.4,0,(j-100)*.4);
                 scene.add(cube);
-            
+                timeRender();
             }
         }
     }
@@ -655,6 +536,7 @@ function axes(startLon, startLat, endLon,endLat, fn) {
     var line=new THREE.Line(geometry,material);
     // 加入到场景中
     scene.add(line); 
+    timeRender();
     if (fn) {
         fn(pathArr.length * 4)
         // //步行导航
@@ -681,6 +563,7 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    timeRender();
 
 }
 /* 加载导航箭头图片 */
@@ -709,10 +592,11 @@ function loadImg() {
     mesh.rotation.x += -0.5 * Math.PI;
     mesh.rotation.z += -1 * Math.PI;
     scene.add(mesh);
+    timeRender();
     geolocation();
     setInterval(function() {
         geolocation();
-    }, 2000)
+    }, 5000)
 }
 
 /*加载起点图标*/
@@ -731,6 +615,7 @@ function loadStartImg(x, z) {
     meshStart.position.x = clickX;
     meshStart.position.z = clickZ;
     scene.add(meshStart);
+    timeRender();
 }
 
 /*加载终点图标*/
@@ -749,6 +634,7 @@ function loadEndImg(x, z, fn) {
     meshEnd.position.x = clickX;
     meshEnd.position.z = clickZ;
     scene.add(meshEnd);
+    timeRender();
     document.addEventListener( 'click', onMouseClick.bind(window, fn), false );
 }
 /**
@@ -873,7 +759,16 @@ function init() {
     if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
         makeSkybox();
     }
-    initContent();
+    if(gltfEnd) {
+        initContent();
+    }else {
+        setTimeout(function() {
+            initContent();
+        },10000)
+    }
+
+    
+    
     /* grid绘制网格 */
     // pathGrid()
 
@@ -883,13 +778,18 @@ function init() {
     
     /* 监听事件 */
     window.addEventListener('resize', onWindowResize, false);
+    controls.addEventListener('change', function(){
+        timeRender();
+    });
 
 }
 
 var clock = new THREE.Clock();
+var renderEnabled;
+
 /* 循环渲染 */
 function animate() {
-    requestAnimationFrame(animate);
+    // requestAnimationFrame(animate);
     controls.update(clock.getDelta());
     if(controlsFlag == 'manyou') {
         if(progress>1.0){
@@ -905,8 +805,32 @@ function animate() {
             }
         }
     }
-    renderer.render(scene, camera);
-    update();
+    if (renderEnabled) {
+        renderer.render(scene, camera);
+    }
+
+    requestAnimationFrame(animate);
+    // renderer.render(scene, camera);
+    // update();
+}
+
+THREE.DefaultLoadingManager.onLoad = function () {
+	timeRender();
+};
+
+//调用一次可以渲染三秒
+let timeOut = null;
+function timeRender() {
+	//设置为可渲染状态
+    renderEnabled = true;
+    //清除上次的延迟器
+    if (timeOut) {
+        clearTimeout(timeOut);
+    }
+
+    timeOut = setTimeout(function () {
+        renderEnabled = false;
+    }, 1500);
 }
 
 /* 初始加载 */
