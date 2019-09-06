@@ -1,6 +1,8 @@
 // 模型是否加载完毕
 const gltfEnd = localStorage.getItem('gltfEnd');
-if(!gltfEnd) {
+// 默认为地三人称相机
+let controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
+if(!gltfEnd && controlsFlag != 'pingmian') {
     $('#container').append(`
     <div id="loading">
         <div class="load-test">校园地图正在玩命加载中。。。。请稍等</div>
@@ -43,7 +45,7 @@ const map = new AMap.Map("mapBox", {
     * position 校园风光位置
     * meshBg 地图底图
 */
-let scene, camera, renderer, controls, mesh, meshEnd, curve, progress=0, startPathX, startPathZ, controlsFlag, stepsList = [], clickX, clickZ;
+let scene, camera, renderer, controls, mesh, meshEnd, curve, progress=0, startPathX, startPathZ, stepsList = [], clickX, clickZ;
 const center = GetQueryString('center');
 const nearby = GetQueryString('nearby');
 const startCenter = GetQueryString('startCenter');
@@ -54,8 +56,6 @@ const position = GetQueryString('position');
 /* 初始坐标在北门 */
 startPathX = CalculationX(116.648592);
 startPathZ = CalculationZ(39.921754);
-// 默认为地三人称相机
-controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 // 性能插件
 // let stats = initStats();
 /* 创建场景 */
@@ -149,7 +149,6 @@ function initLight() {
     scene.add(ambientLight);
     scene.add(hemisphereLight);  
     scene.add(shadowLight);
-    timeRender();
 }
 
 /* 
@@ -209,7 +208,6 @@ function initContent() {
                 localStorage.setItem('gltfEnd', true); 
             }
             console.log('mocing',gltfNum)
-            timeRender();
     
         }, function (xhr) {
 
@@ -240,7 +238,6 @@ function initBg() {
         meshBg.position.z = 0;
         meshBg.rotation.x += -0.5 * Math.PI;
         scene.add(meshBg);
-        timeRender();
     }
     var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1); 
     for(let i = 1, n = 4; i <= n; i++) {
@@ -256,7 +253,6 @@ function initBg() {
         meshBg.position.z = 2;
         meshBg.rotation.x += -0.5 * Math.PI;
         scene.add(meshBg);
-        timeRender();
     }    
 }
 
@@ -288,7 +284,6 @@ function makeSkybox() {
     sky.position.y = 0;
     //场景当中加入天空盒
     scene.add( sky );
-    timeRender();
 }
 
 /** 
@@ -434,7 +429,6 @@ function initGround() {
 		}));
 		line.position.z = (i * 10 / 25) - length / 50;
         scene.add(line);
-        timeRender();
 
 		var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
 			color: 0x808080,
@@ -443,7 +437,6 @@ function initGround() {
 		line.position.x = (i * 10 / 25) - length / 50;
 		line.rotation.y = 90 * Math.PI / 180;
         scene.add(line);
-        timeRender();
 
 	}
 	var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
@@ -453,7 +446,6 @@ function initGround() {
 	});
 	var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
     scene.add(skyBox);
-    timeRender();
 
 }
 
@@ -475,7 +467,6 @@ function initGrid() {
                 var cube = new THREE.Mesh( geometry, material );
                 cube.position.set((i-100)*.4,0,(j-100)*.4);
                 scene.add(cube);
-                timeRender();
             }
         }
     }
@@ -536,7 +527,6 @@ function axes(startLon, startLat, endLon,endLat, fn) {
     var line=new THREE.Line(geometry,material);
     // 加入到场景中
     scene.add(line); 
-    timeRender();
     if (fn) {
         fn(pathArr.length * 4)
         // //步行导航
@@ -563,8 +553,6 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    timeRender();
-
 }
 /* 加载导航箭头图片 */
 function loadImg() {
@@ -592,7 +580,6 @@ function loadImg() {
     mesh.rotation.x += -0.5 * Math.PI;
     mesh.rotation.z += -1 * Math.PI;
     scene.add(mesh);
-    timeRender();
     geolocation();
     setInterval(function() {
         geolocation();
@@ -615,7 +602,6 @@ function loadStartImg(x, z) {
     meshStart.position.x = clickX;
     meshStart.position.z = clickZ;
     scene.add(meshStart);
-    timeRender();
 }
 
 /*加载终点图标*/
@@ -634,7 +620,6 @@ function loadEndImg(x, z, fn) {
     meshEnd.position.x = clickX;
     meshEnd.position.z = clickZ;
     scene.add(meshEnd);
-    timeRender();
     document.addEventListener( 'click', onMouseClick.bind(window, fn), false );
 }
 /**
@@ -758,13 +743,13 @@ function init() {
     initBg();
     if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
         makeSkybox();
-    }
-    if(gltfEnd) {
-        initContent();
-    }else {
-        setTimeout(function() {
+        if(gltfEnd) {
             initContent();
-        },10000)
+        }else {
+            setTimeout(function() {
+                initContent();
+            },10000)
+        }
     }
 
     
@@ -778,9 +763,6 @@ function init() {
     
     /* 监听事件 */
     window.addEventListener('resize', onWindowResize, false);
-    controls.addEventListener('change', function(){
-        timeRender();
-    });
 
 }
 
@@ -805,33 +787,14 @@ function animate() {
             }
         }
     }
-    if (renderEnabled) {
-        renderer.render(scene, camera);
-    }
+
+    renderer.render(scene, camera);
 
     requestAnimationFrame(animate);
     // renderer.render(scene, camera);
     // update();
 }
 
-THREE.DefaultLoadingManager.onLoad = function () {
-	timeRender();
-};
-
-//调用一次可以渲染三秒
-let timeOut = null;
-function timeRender() {
-	//设置为可渲染状态
-    renderEnabled = true;
-    //清除上次的延迟器
-    if (timeOut) {
-        clearTimeout(timeOut);
-    }
-
-    timeOut = setTimeout(function () {
-        renderEnabled = false;
-    }, 1500);
-}
 
 /* 初始加载 */
 (function () {
