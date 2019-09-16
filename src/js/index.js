@@ -227,7 +227,11 @@ function initBg() {
     var skyBoxGeometry1 = new THREE.PlaneGeometry(78, 39, 1); 
     for(let i = 1, n = 5; i <= n; i++) {
         // ${process.env.BASE_API}
-        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}/3dschool/schoolatlas/0${i}.png`);
+        if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
+            var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}/3dschool/schoolatlas/0${i}a.png`);
+        }else {
+            var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}/3dschool/schoolatlas/0${i}.png`);
+        }
         var material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true
