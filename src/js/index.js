@@ -2,13 +2,13 @@
 const gltfEnd = localStorage.getItem('gltfEnd');
 // 默认为地三人称相机
 let controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
-if(!gltfEnd && controlsFlag != 'pingmian') {
-    $('#container').append(`
-    <div id="loading">
-        <div class="load-test">校园地图正在玩命加载中。。。。请稍等</div>
-    </div>
-    `);
-}
+// if(!gltfEnd && controlsFlag != 'pingmian') {
+//     $('#container').append(`
+//     <div id="loading">
+//         <div class="load-test">校园地图正在玩命加载中。。。。请稍等</div>
+//     </div>
+//     `);
+// }
 import '../style/index';
 import '../style/style';
 import { GetQueryString, fuzzyQuery, CalculationX, CalculationZ, unid, erwei } from '../utils/util';
@@ -201,13 +201,16 @@ function initContent() {
             object.position.y = 0;
             object.position.x = 0;
             object.position.z = 0;
-            scene.add(object);
-            gltfNum++
-            if(gltfNum == gltfLength) {
-                $('#loading').hide();
-                localStorage.setItem('gltfEnd', true); 
+            if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
+                scene.add(object);
+            }else {
+                gltfNum++
+                if(gltfNum == gltfLength) {
+                    // $('#loading').hide();
+                    localStorage.setItem('gltfEnd', true); 
+                }
+                console.log('mocing',gltfNum)
             }
-            console.log('mocing',gltfNum)
     
         }, function (xhr) {
 
@@ -480,7 +483,7 @@ function initGrid() {
 /* 设置导航路线 */
 function axes(startLon, startLat, endLon,endLat, fn) {
     //定义材质THREE.LineBasicMaterial . MeshBasicMaterial...都可以
-    var material = new THREE.LineBasicMaterial({color:0xff6804, linewidth: 10});
+    var material = new THREE.LineBasicMaterial({color:0xff6804, linewidth: 5});
     // 空几何体，里面没有点的信息,不想BoxGeometry已经有一系列点，组成方形了。
     var geometry = new THREE.Geometry();
     var maps = new Graph(arrJson);
@@ -747,16 +750,15 @@ function init() {
     initBg();
     if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
         makeSkybox();
-        if(gltfEnd) {
-            initContent();
-        }else {
-            setTimeout(function() {
-                initContent();
-            },10000)
-        }
     }
 
-    
+    if(gltfEnd) {
+        initContent();
+    }else {
+        setTimeout(function() {
+            initContent();
+        },10000)
+    }
     
     /* grid绘制网格 */
     // pathGrid()
