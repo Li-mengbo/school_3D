@@ -1,7 +1,5 @@
 // 模型是否加载完毕
 const gltfEnd = localStorage.getItem('gltfEnd');
-// 默认为地三人称相机
-let controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 // if(!gltfEnd && controlsFlag != 'pingmian') {
 //     $('#container').append(`
 //     <div id="loading">
@@ -51,6 +49,8 @@ const nearby = GetQueryString('nearby');
 const startCenter = GetQueryString('startCenter');
 const endCenter = GetQueryString('endCenter');
 const position = GetQueryString('position');
+// 默认为地三人称相机
+let controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 // 是否缓存
 // const storageDB = localStorage.getItem('storageDB')
 /* 初始坐标在北门 */
