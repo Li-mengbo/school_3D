@@ -274,5 +274,4 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
     ]
 }
 
-
 export default gltf;

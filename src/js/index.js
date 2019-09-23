@@ -1,7 +1,3 @@
-// 模型是否加载完毕
-const gltfEnd = localStorage.getItem('gltfEnd');
-// 默认为地三人称相机
-let controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 // if(!gltfEnd && controlsFlag != 'pingmian') {
 //     $('#container').append(`
 //     <div id="loading">
@@ -17,6 +13,47 @@ import $ from 'jquery';
 import arrJson from '../utils/test.json';
 // alert(navigator.userAgent)
 console.log(process.env.BASE_API)
+//防止页面后退
+var XBack = {};
+ 
+(function(XBack) {
+    XBack.STATE = 'x - back';
+    XBack.element;
+
+    XBack.onPopState = function(event) {
+        event.state === XBack.STATE && XBack.fire();
+        XBack.record(XBack.STATE); //初始化事件时，push一下
+    };
+
+    XBack.record = function(state) {
+        history.pushState(state, null, location.href);
+    };
+
+    XBack.fire = function() {
+        var event = document.createEvent('Events');
+        event.initEvent(XBack.STATE, false, false);
+        XBack.element.dispatchEvent(event);
+    };
+
+    XBack.listen = function(listener) {
+        XBack.element.addEventListener(XBack.STATE, listener, false);
+    };
+
+    XBack.init = function() {
+        XBack.element = document.createElement('span');
+        window.addEventListener('popstate', XBack.onPopState);
+        XBack.record(XBack.STATE);
+    };
+
+})(XBack); // 引入这段js文件
+
+XBack.init();
+XBack.listen(function() {});
+
+// 模型是否加载完毕
+const gltfEnd = localStorage.getItem('gltfEnd');
+// 默认为地三人称相机
+let controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 /* 地图路线绘制 */
 const map = new AMap.Map("mapBox", {
     viewMode:'3D',
@@ -80,8 +117,6 @@ function update() {
     stats.update();
 
 }
-
-
 /* 相机 */
 function initCamera() {
     /*
@@ -116,10 +151,11 @@ function initRender() {
     renderer = new THREE.WebGLRenderer({
         antialias: true
     });
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0xffffff);
     document.getElementById('three').appendChild(renderer.domElement);
-
+    
 }
 
 /* 灯光 */
@@ -217,7 +253,6 @@ function initContent() {
             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
     
         }, function (error) {
-    
             console.log('load error!' + error.getWebGLErrorMessage());
     
         })
@@ -605,7 +640,11 @@ function loadStartImg(x, z) {
         transparent: true
     });
     const meshStart = new THREE.Mesh(skyBoxGeometry, material);
-    meshStart.position.y = 2.5;
+    if(controlsFlag == 'pingmian') {
+        meshStart.position.y = 2.5;
+    } else {
+        meshStart.position.y = 1;
+    }
     meshStart.position.x = clickX;
     meshStart.position.z = clickZ;
     scene.add(meshStart);
@@ -623,7 +662,12 @@ function loadEndImg(x, z, fn) {
         transparent: true
     });
     meshEnd = new THREE.Mesh(skyBoxGeometry, material);
-    meshEnd.position.y = 8;
+    if(controlsFlag == 'pingmian') {
+        meshEnd.position.y = 8;
+    } else {
+        meshEnd.position.y = 1;
+    }
+    
     meshEnd.position.x = clickX;
     meshEnd.position.z = clickZ;
     scene.add(meshEnd);
