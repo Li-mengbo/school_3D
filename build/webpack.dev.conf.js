@@ -11,6 +11,7 @@ module.exports = merge(baseConfig, {
     port: 8887,
     // host: '192.168.12.36'
     // host: '192.168.1.66'
+    host: '192.168.0.103'
   },
   module:{
     rules: [
