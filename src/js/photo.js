@@ -2,7 +2,7 @@ import '../style/style';
 import '../style/photo';
 import { GetQueryString, fuzzyQuery } from '../utils/util';
 import $ from 'jquery';
-if(navigator.userAgent.indexOf('iPhone') != -1) {
+if(navigator.userAgent.indexOf('iPhone') == -1) {
     //防止页面后退
     var XBack = {};
     

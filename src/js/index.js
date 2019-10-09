@@ -13,7 +13,7 @@ import $ from 'jquery';
 import arrJson from '../utils/test.json';
 // alert(navigator.userAgent)
 console.log(process.env.BASE_API)
-if(navigator.userAgent.indexOf('iPhone') != -1) {
+if(navigator.userAgent.indexOf('iPhone') == -1) {
     //防止页面后退
     var XBack = {};
     
@@ -1329,4 +1329,9 @@ function orientationHandler(event) {
     // mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
 }
 $('.amap-geo').hide();
+if(controlsFlag == 'manyou') {
+    $('#three').click(function() {
+        controlsFlag = controlsFlag == 'manyou' ? 'manyou2' : 'manyou'     
+    })
+}
 
