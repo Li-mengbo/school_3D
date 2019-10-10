@@ -2,7 +2,44 @@ import '../style/style';
 import '../style/school';
 import { GetQueryString, fuzzyQuery } from '../utils/util';
 import $ from 'jquery';
-
+if(navigator.userAgent.indexOf('iPhone') == -1) {
+    //防止页面后退
+    var XBack = {};
+    
+    (function(XBack) {
+        XBack.STATE = 'x - back';
+        XBack.element;
+  
+        XBack.onPopState = function(event) {
+            event.state === XBack.STATE && XBack.fire();
+            XBack.record(XBack.STATE); //初始化事件时，push一下
+        };
+  
+        XBack.record = function(state) {
+            history.pushState(state, null, location.href);
+        };
+  
+        XBack.fire = function() {
+            var event = document.createEvent('Events');
+            event.initEvent(XBack.STATE, false, false);
+            XBack.element.dispatchEvent(event);
+        };
+  
+        XBack.listen = function(listener) {
+            XBack.element.addEventListener(XBack.STATE, listener, false);
+        };
+  
+        XBack.init = function() {
+            XBack.element = document.createElement('span');
+            window.addEventListener('popstate', XBack.onPopState);
+            XBack.record(XBack.STATE);
+        };
+  
+    })(XBack); // 引入这段js文件
+  
+    XBack.init();
+    XBack.listen(function() {});
+}
 $('.item').click(function () {
     const index = $(this).attr('data-index')
     $.ajax({ 
@@ -67,40 +104,82 @@ $('.item').click(function () {
                         },300)
                     }
                 })
+                let lengths;
+                let indexs = 0;
                 $('.tuji').click(function () {
                     const ind = $(this).attr('data-index');
                     // console.log(schoolList[ind])
+                    $('.photo-img').html('');
+                    lengths = schoolList[ind].images.length;
+                    console.log(lengths)
                     schoolList[ind].images.forEach((img) => {
-                        console.log(img)
                         $('.photo-img').append(
                             `
                                 <img class="fengguang" src="${img}" alt="" />
                             `
                         )
                     })
-                    const length = $('.fengguang').length;
-                    let index = 0;
-                    $('.left').click(function () {
-                        index--;
-                        if(index < 0) {
-                            index = 0;
-                            return false;
-                        }
-                        $('.fengguang').hide();
-                        $('.fengguang:eq('+ index +')').show();
-                    })
-                    $('.right').click(function () {
-                        index++;
-                        if(index >= length) {
-                            index = length - 1;
-                            return false;
-                        }
-                        $('.fengguang').hide();
-                        $('.fengguang:eq('+ index +')').show();
-                    })
                     $('.photo-container').show();
                     $('.photo').show();
                 })
+                $('.left').click(function () {
+                    indexs--;
+                    console.log(indexs, lengths)
+                    if(indexs < 0) {
+                        indexs = 0;
+                        return false;
+                    }
+                    $(this).css({"background": "#fff"})
+                    $('.right').css({"background": "skyblue"})
+                    $('.fengguang').hide();
+                    $('.fengguang:eq('+ indexs +')').show();
+                })
+                $('.right').click(function () {
+                    indexs++;
+                    console.log(indexs, lengths)
+                    if(indexs >= lengths) {
+                        indexs = lengths - 1;
+                        return false;
+                    }
+                    $(this).css({"background": "#fff"})
+                    $('.left').css({"background": "skyblue"})
+                    $('.fengguang').hide();
+                    $('.fengguang:eq('+ indexs +')').show();
+                })
+                // $('.tuji').click(function () {
+                //     const ind = $(this).attr('data-index');
+                //     // console.log(schoolList[ind])
+                //     schoolList[ind].images.forEach((img) => {
+                //         console.log(img)
+                //         $('.photo-img').append(
+                //             `
+                //                 <img class="fengguang" src="${img}" alt="" />
+                //             `
+                //         )
+                //     })
+                //     const length = $('.fengguang').length;
+                //     let index = 0;
+                //     $('.left').click(function () {
+                //         index--;
+                //         if(index < 0) {
+                //             index = 0;
+                //             return false;
+                //         }
+                //         $('.fengguang').hide();
+                //         $('.fengguang:eq('+ index +')').show();
+                //     })
+                //     $('.right').click(function () {
+                //         index++;
+                //         if(index >= length) {
+                //             index = length - 1;
+                //             return false;
+                //         }
+                //         $('.fengguang').hide();
+                //         $('.fengguang:eq('+ index +')').show();
+                //     })
+                //     $('.photo-container').show();
+                //     $('.photo').show();
+                // })
             }
         }
     });    

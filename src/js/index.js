@@ -1,5 +1,3 @@
-// 模型是否加载完毕
-const gltfEnd = localStorage.getItem('gltfEnd');
 // if(!gltfEnd && controlsFlag != 'pingmian') {
 //     $('#container').append(`
 //     <div id="loading">
@@ -15,6 +13,48 @@ import $ from 'jquery';
 import arrJson from '../utils/test.json';
 // alert(navigator.userAgent)
 console.log(process.env.BASE_API)
+if(navigator.userAgent.indexOf('iPhone') == -1) {
+    //防止页面后退
+    var XBack = {};
+    
+    (function(XBack) {
+        XBack.STATE = 'x - back';
+        XBack.element;
+
+        XBack.onPopState = function(event) {
+            event.state === XBack.STATE && XBack.fire();
+            XBack.record(XBack.STATE); //初始化事件时，push一下
+        };
+
+        XBack.record = function(state) {
+            history.pushState(state, null, location.href);
+        };
+
+        XBack.fire = function() {
+            var event = document.createEvent('Events');
+            event.initEvent(XBack.STATE, false, false);
+            XBack.element.dispatchEvent(event);
+        };
+
+        XBack.listen = function(listener) {
+            XBack.element.addEventListener(XBack.STATE, listener, false);
+        };
+
+        XBack.init = function() {
+            XBack.element = document.createElement('span');
+            window.addEventListener('popstate', XBack.onPopState);
+            XBack.record(XBack.STATE);
+        };
+
+    })(XBack); // 引入这段js文件
+
+    XBack.init();
+    XBack.listen(function() {});
+}
+// 模型是否加载完毕
+const gltfEnd = localStorage.getItem('gltfEnd');
+// 默认为地三人称相机
+let controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 /* 地图路线绘制 */
 const map = new AMap.Map("mapBox", {
     viewMode:'3D',
@@ -80,8 +120,6 @@ function update() {
     stats.update();
 
 }
-
-
 /* 相机 */
 function initCamera() {
     /*
@@ -116,10 +154,11 @@ function initRender() {
     renderer = new THREE.WebGLRenderer({
         antialias: true
     });
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0xffffff);
     document.getElementById('three').appendChild(renderer.domElement);
-
+    
 }
 
 /* 灯光 */
@@ -217,7 +256,6 @@ function initContent() {
             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
     
         }, function (error) {
-    
             console.log('load error!' + error.getWebGLErrorMessage());
     
         })
@@ -605,7 +643,11 @@ function loadStartImg(x, z) {
         transparent: true
     });
     const meshStart = new THREE.Mesh(skyBoxGeometry, material);
-    meshStart.position.y = 2.5;
+    if(controlsFlag == 'pingmian') {
+        meshStart.position.y = 2.5;
+    } else {
+        meshStart.position.y = 1;
+    }
     meshStart.position.x = clickX;
     meshStart.position.z = clickZ;
     scene.add(meshStart);
@@ -623,7 +665,12 @@ function loadEndImg(x, z, fn) {
         transparent: true
     });
     meshEnd = new THREE.Mesh(skyBoxGeometry, material);
-    meshEnd.position.y = 8;
+    if(controlsFlag == 'pingmian') {
+        meshEnd.position.y = 8;
+    } else {
+        meshEnd.position.y = 1;
+    }
+    
     meshEnd.position.x = clickX;
     meshEnd.position.z = clickZ;
     scene.add(meshEnd);
@@ -780,9 +827,9 @@ function animate() {
     // requestAnimationFrame(animate);
     controls.update(clock.getDelta());
     if(controlsFlag == 'manyou') {
-        if(progress>1.0){
-            return;    //停留在管道末端,否则会一直跑到起点 循环再跑
-        }
+        // if(progress>1.0){
+        //     return;    //停留在管道末端,否则会一直跑到起点 循环再跑
+        // }
         // 相机漫游模式
         if (curve.points.length > 0) {
             progress += 0.0001;
@@ -872,12 +919,12 @@ if (center) {
         }
     });
 }
-
-// 搜索模糊查询
-$('.search-btn').click(function() {
-    // exportRaw('test.json', JSON.stringify(graph))
+$('input').on('input', function(e){
     const str = $('input').val();
-    if(!str) return;
+    if(!str) {
+        $('.search-list').hide().html('')
+        return
+    };
     $('.search-list').show().html('');
     let searchList = fuzzyQuery(mapList, str);
     if(searchList.length > 0) {
@@ -920,7 +967,61 @@ $('.search-btn').click(function() {
         $('.search-list').append('<li>没有查到</li>')
     }
     // 模糊查询关闭
-    $('#mapBox').click(function() {
+    $('#three').click(function() {
+        $('.search-list').hide()
+    })
+})
+// 搜索模糊查询
+$('.search-btn').click(function() {
+    // exportRaw('test.json', JSON.stringify(graph))
+    const str = $('input').val();
+    if(!str) {
+        $('.search-list').hide().html('')
+        return
+    };
+    $('.search-list').show().html('');
+    let searchList = fuzzyQuery(mapList, str);
+    if(searchList.length > 0) {
+        searchList.forEach(function(item){
+            $('.search-list').append(`<li class="search-position" data-position="${item.center}">${item.name}</li>`)
+        })
+        // 搜索位置并导航
+        $('.search-position').click(function() {
+            $('.search-list').hide();
+            $('.footer').hide();
+            $('.school').hide();
+            $('.panorama').hide();
+            const name = $(this).html();
+            const position = $(this).attr('data-position').split(',');
+            /**
+             * 在此搜索删除上一个scene也就是删除上个终点
+             */
+            var allChildren = scene.children;
+            var lastObject = allChildren[allChildren.length-1];
+            if(lastObject instanceof THREE.Mesh){
+                scene.remove(lastObject);
+            }
+            /**
+             * 执行加载终点坐标方法绘制点并且导航
+             */
+            loadStartImg(startPathX, startPathZ);
+            loadEndImg(position[0], position[1], function() {
+                $('.serach').hide();
+                axes(startPathX, startPathZ, position[0], position[1], function(result) {
+                    $('.distance').show();
+                    $('.head').show().find('span').html('退出导航');
+                    $('.title').html('');
+                    $('.title').append(`
+                    <span>${name}</span>
+                    <span>${result}.${Math.ceil(Math.random()*10)}米</span>`)
+                })
+            });
+        })
+    }else {
+        $('.search-list').append('<li>没有查到</li>')
+    }
+    // 模糊查询关闭
+    $('#three').click(function() {
         $('.search-list').hide()
     })
 })
@@ -1230,4 +1331,9 @@ function orientationHandler(event) {
     // mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
 }
 $('.amap-geo').hide();
+if(controlsFlag == 'manyou') {
+    $('#three').click(function() {
+        controlsFlag = controlsFlag == 'manyou' ? 'manyou2' : 'manyou'     
+    })
+}
 
