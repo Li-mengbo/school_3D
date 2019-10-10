@@ -89,8 +89,6 @@ const nearby = GetQueryString('nearby');
 const startCenter = GetQueryString('startCenter');
 const endCenter = GetQueryString('endCenter');
 const position = GetQueryString('position');
-// 默认为地三人称相机
-let controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 // 是否缓存
 // const storageDB = localStorage.getItem('storageDB')
 /* 初始坐标在北门 */
@@ -265,40 +263,56 @@ function initContent() {
 
 /* 地图底图 加载底图图片 PlaneGeometry二维平面*/
 function initBg() {
-    var skyBoxGeometry1 = new THREE.PlaneGeometry(78, 39, 1); 
-    for(let i = 1, n = 5; i <= n; i++) {
-        // ${process.env.BASE_API}
-        if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
-            var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}/3dschool/schoolatlas/0${i}a.png`);
-        }else {
-            var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}/3dschool/schoolatlas/0${i}.png`);
-        }
-        var material = new THREE.MeshBasicMaterial({
-            map: texture,
-            transparent: true
-        });
-        const meshBg = new THREE.Mesh(skyBoxGeometry1, material);
-        meshBg.position.y = 0;
-        meshBg.position.x = 0;
-        meshBg.position.z = 0;
-        meshBg.rotation.x += -0.5 * Math.PI;
-        scene.add(meshBg);
+    var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1);
+    if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
+        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/SchoolAtlas_a.jpg`);
+    }else {
+        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/SchoolAtlas.jpg`);
     }
-    var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1); 
-    for(let i = 1, n = 4; i <= n; i++) {
-        // ${process.env.BASE_API}
-        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/m0${i}.png`);
-        var material = new THREE.MeshBasicMaterial({
-            map: texture,
-            transparent: true
-        });
-        var meshBg = new THREE.Mesh(skyBoxGeometry2, material);
-        meshBg.position.y = -.4;
-        meshBg.position.x = .3;
-        meshBg.position.z = 2;
-        meshBg.rotation.x += -0.5 * Math.PI;
-        scene.add(meshBg);
-    }    
+    var material = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true
+    });
+    var meshBg = new THREE.Mesh(skyBoxGeometry2, material);
+    meshBg.position.y = 0;
+    meshBg.position.x = 0;
+    meshBg.position.z = 0;
+    meshBg.rotation.x += -0.5 * Math.PI;
+    scene.add(meshBg);  
+    // var skyBoxGeometry1 = new THREE.PlaneGeometry(78, 39, 1);
+    // for(let i = 1, n = 5; i <= n; i++) {
+    //     // ${process.env.BASE_API}
+    //     if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
+    //         var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}/3dschool/schoolatlas/0${i}a.png`);
+    //     }else {
+    //         var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}/3dschool/schoolatlas/0${i}.png`);
+    //     }
+    //     var material = new THREE.MeshBasicMaterial({
+    //         map: texture,
+    //         transparent: true
+    //     });
+    //     const meshBg = new THREE.Mesh(skyBoxGeometry1, material);
+    //     meshBg.position.y = 0;
+    //     meshBg.position.x = 0;
+    //     meshBg.position.z = 0;
+    //     meshBg.rotation.x += -0.5 * Math.PI;
+    //     scene.add(meshBg);
+    // }
+    // var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1); 
+    // for(let i = 1, n = 4; i <= n; i++) {
+    //     // ${process.env.BASE_API}
+    //     var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/m0${i}.png`);
+    //     var material = new THREE.MeshBasicMaterial({
+    //         map: texture,
+    //         transparent: true
+    //     });
+    //     var meshBg = new THREE.Mesh(skyBoxGeometry2, material);
+    //     meshBg.position.y = -.4;
+    //     meshBg.position.x = .3;
+    //     meshBg.position.z = 2;
+    //     meshBg.rotation.x += -0.5 * Math.PI;
+    //     scene.add(meshBg);
+    // }    
 }
 
 /* 加载天空盒子 */
@@ -743,13 +757,15 @@ function onMouseClick(fn, event ) {
     */
   
     // 通过鼠标点的位置和当前相机的矩阵计算出raycaster
-    raycaster.setFromCamera( mouse, camera );
+    raycaster.setFromCamera(mouse, camera);
 
     // 获取raycaster直线和所有模型相交的数组集合
-    var intersects = raycaster.intersectObjects( scene.children );
-    
+    var intersects = raycaster.intersectObjects(scene.children);
     console.log(JSON.parse(JSON.stringify(meshEnd)).object, intersects[0])
-    const clickUuid = intersects[0].object.uuid;
+    let clickUuid = '';
+    if(intersects[0]) {
+        clickUuid = intersects[0].object.uuid;
+    }
     const meshEndUuid = JSON.parse(JSON.stringify(meshEnd)).object.uuid;
     // console.log(clickUuid ==  meshEndUuid)
     // 判断点击物体uuid是否相等就可以知道是否点击了这个物体
@@ -940,12 +956,14 @@ $('input').on('input', function(e){
             const name = $(this).html();
             const position = $(this).attr('data-position').split(',');
             /**
-             * 在此搜索删除上一个scene也就是删除上个终点
+             * 再次搜索删除上一个scene也就是删除上个终点
              */
             var allChildren = scene.children;
-            var lastObject = allChildren[allChildren.length-1];
-            if(lastObject instanceof THREE.Mesh){
-                scene.remove(lastObject);
+            if(allChildren.length > 6) {
+                var lastObject = allChildren[allChildren.length-1];
+                if(lastObject instanceof THREE.Mesh){
+                    scene.remove(lastObject);
+                }
             }
             /**
              * 执行加载终点坐标方法绘制点并且导航
@@ -994,12 +1012,14 @@ $('.search-btn').click(function() {
             const name = $(this).html();
             const position = $(this).attr('data-position').split(',');
             /**
-             * 在此搜索删除上一个scene也就是删除上个终点
+             * 再次搜索删除上一个scene也就是删除上个终点
              */
             var allChildren = scene.children;
-            var lastObject = allChildren[allChildren.length-1];
-            if(lastObject instanceof THREE.Mesh){
-                scene.remove(lastObject);
+            if(allChildren.length > 6) {
+                var lastObject = allChildren[allChildren.length-1];
+                if(lastObject instanceof THREE.Mesh){
+                    scene.remove(lastObject);
+                }
             }
             /**
              * 执行加载终点坐标方法绘制点并且导航

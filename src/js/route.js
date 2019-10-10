@@ -90,7 +90,7 @@ $.ajax({
                         console.log('获取坐标',res)
                         if(res.code == 200) {
                           const positionList = res.data;
-                          $(that).parent('.open').prev('input').val(positionList.name);
+                          $(that).parent('.open').prev('input').val(name);
                           $(that).parents('.activity').animate({
                             height: '.8rem',
                           }, 1000)
@@ -102,6 +102,96 @@ $.ajax({
         }
     }
 });
+$('.start').on('input', function(e){
+    const str = $('.start').val();
+    if(!str) {
+        $(this).parent('.activity').animate({
+            height: '.8rem',
+        }, 1000)
+        return
+    };
+    $(this).next('.open').html('');
+    let searchList = fuzzyQuery(mapList, str);
+    if(searchList.length > 0) {
+        searchList.forEach(function(item){
+            $('.open').append(
+                `
+                <p class="open-title">${item.name}</p>
+                `
+            )
+        })
+        var length =  $(this).parent('.activity').find('.open-title').length + 1 || 1;
+        $(this).parent('.activity').animate({
+            height: length * .9 + 'rem', 
+        },1000)
+        $(this).parent('.activity').attr('data-flag', 'flase')
+        $('.open-title').click(function () {
+            const name = $(this).html();
+            const that = this;
+            // 获取坐标
+            $.ajax({ 
+                // ${process.env.BASE_API}
+                url: `${process.env.BASE_API}school-map/sitePosition/getByName?name=${name}`, 
+                success: function(res){
+                    console.log('获取坐标',res)
+                    if(res.code == 200) {
+                      const positionList = res.data;
+                      $(that).parent('.open').prev('input').val(name);
+                      $(that).parents('.activity').animate({
+                        height: '.8rem',
+                      }, 1000)
+                      $(that).parents('.activity').attr('data-flag', 'true')
+                    }
+                }
+            });
+        })        
+    }
+})
+$('.end').on('input', function(e){
+    const str = $('.end').val();
+    if(!str) {
+        $(this).parent('.activity').animate({
+            height: '.8rem',
+        }, 1000)
+        return
+    };
+    $(this).next('.open').html('');
+    let searchList = fuzzyQuery(mapList, str);
+    if(searchList.length > 0) {
+        searchList.forEach(function(item){
+            $('.open').append(
+                `
+                <p class="open-title">${item.name}</p>
+                `
+            )
+        })
+        var length =  $(this).parent('.activity').find('.open-title').length + 1 || 1;
+        $(this).parent('.activity').animate({
+            height: length * .9 + 'rem', 
+        },1000)
+        $(this).parent('.activity').attr('data-flag', 'flase')
+        $('.open-title').click(function () {
+            const name = $(this).html();
+            const that = this;
+            // 获取坐标
+            $.ajax({ 
+                // ${process.env.BASE_API}
+                url: `${process.env.BASE_API}school-map/sitePosition/getByName?name=${name}`, 
+                success: function(res){
+                    console.log('获取坐标',res)
+                    if(res.code == 200) {
+                      const positionList = res.data;
+                      $(that).parent('.open').prev('input').val(name);
+                      $(that).parents('.activity').animate({
+                        height: '.8rem',
+                      }, 1000)
+                      $(that).parents('.activity').attr('data-flag', 'true')
+                    }
+                }
+            });
+        })        
+    }
+})
 $('.walk').click(function() {
     const start = $('.start').val();
     const end = $('.end').val();
