@@ -1160,7 +1160,7 @@ function onComplete(data) {
     if(data.position) {
         const initPosition = JSON.parse(JSON.stringify(data.position));
         startPathX = 116.643804 < initPosition.lng && initPosition.lng <116.650751 ? CalculationX(initPosition.lng) : CalculationX(116.648592);
-        startPathZ = 39.921923 < initPosition.lat && initPosition.lat < 39.919047 ? CalculationZ(initPosition.lat) : CalculationZ(39.921754);
+        startPathZ = 38.921923 < initPosition.lat && initPosition.lat < 40.919047 ? CalculationZ(initPosition.lat) : CalculationZ(39.921754);
         /*
         var str = [];
         str.push('定位结果：' + data.position);
