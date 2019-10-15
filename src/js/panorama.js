@@ -1,5 +1,6 @@
 import '../style/panorama';
 import '../style/style';
+import $ from 'jquery';
 import { GetQueryString } from '../utils/util';
 if(navigator.userAgent.indexOf('iPhone') == -1) {
   //防止页面后退
@@ -39,29 +40,48 @@ if(navigator.userAgent.indexOf('iPhone') == -1) {
   XBack.init();
   XBack.listen(function() {});
 }
-if (GetQueryString('imgurl')) {
-  var div = document.getElementById('panorama');
-  const img = GetQueryString('imgurl');
-  var PSV = new PhotoSphereViewer({
-    // Panorama, given in base 64
-    panorama: img,
-  
-    // Container
-    container: div,
-  
-    // Deactivate the animation
-    time_anim: false,
-  
-    // Display the navigation bar
-    navbar: false,
-  
-    // Resize the panorama
-    size: {
-      width: '100%',
-      height: '100%'
-    },
-  
-    // No XMP data
-    usexmpdata: false
+/* 全景图展示 */
+const center = GetQueryString('center');
+if (center) {
+  // 获取全景展示信息
+  // https://ryxy-china.picp.vip/school-map/quanjing/getAll
+  $.ajax({ 
+      // ${process.env.BASE_API}
+      url: `${process.env.BASE_API}school-map/quanjing/getAll`, 
+      success: function(res){
+          console.log('全景图',res)
+          if(res.code == 200) {
+             const provinces = res.data;
+             for (let i = 0; i < provinces.length; i += 1) {
+                 // var markerContent = document.createElement("div");
+                 if(provinces[i].center == center) {
+                   var div = document.getElementById('panorama');
+                   const img = provinces[i].imgUrl;
+                   var PSV = new PhotoSphereViewer({
+                     // Panorama, given in base 64
+                     panorama: img,
+                   
+                     // Container
+                     container: div,
+                   
+                     // Deactivate the animation
+                     time_anim: false,
+                   
+                     // Display the navigation bar
+                     navbar: false,
+                   
+                     // Resize the panorama
+                     size: {
+                       width: '100%',
+                       height: '100%'
+                     },
+                   
+                     // No XMP data
+                     usexmpdata: false
+                   });
+                 }
+             }
+          }
+      }
   });
 }

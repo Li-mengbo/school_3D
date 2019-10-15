@@ -49,7 +49,7 @@ $.ajax({
                 $('.abroad:eq(1)').append(
                   `
                   <div class="activity" data-flag="true">
-                    <a class="activity-title" href="./index.html?center=${item.center}">${item.name}</a>
+                    <a class="activity-title" href="./panorama.html?center=${item.center}">${item.name}</a>
                   </div> 
                   `
                 )
@@ -57,7 +57,7 @@ $.ajax({
                 $('.abroad:eq(0)').append(
                   `
                   <div class="activity" data-flag="true">
-                    <a class="activity-title" href="./index.html?center=${item.center}">${item.name}</a>
+                    <a class="activity-title" href="./panorama.html?center=${item.center}">${item.name}</a>
                   </div> 
                   `
                 )

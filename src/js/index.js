@@ -1,17 +1,9 @@
-// if(!gltfEnd && controlsFlag != 'pingmian') {
-//     $('#container').append(`
-//     <div id="loading">
-//         <div class="load-test">校园地图正在玩命加载中。。。。请稍等</div>
-//     </div>
-//     `);
-// }
 import '../style/index';
 import '../style/style';
 import { GetQueryString, fuzzyQuery, CalculationX, CalculationZ, unid, erwei } from '../utils/util';
 import loadGltf from '../utils/loadGltf';
 import $ from 'jquery';
 import arrJson from '../utils/test.json';
-// alert(navigator.userAgent)
 console.log(process.env.BASE_API)
 if(navigator.userAgent.indexOf('iPhone') == -1) {
     //防止页面后退
@@ -84,7 +76,6 @@ const map = new AMap.Map("mapBox", {
     * meshBg 地图底图
 */
 let scene, camera, renderer, controls, mesh, meshEnd, curve, progress=0, startPathX, startPathZ, stepsList = [], clickX, clickZ;
-const center = GetQueryString('center');
 const nearby = GetQueryString('nearby');
 const startCenter = GetQueryString('startCenter');
 const endCenter = GetQueryString('endCenter');
@@ -138,10 +129,6 @@ function initCamera() {
         setInterval(function() {
             geolocation(); 
         },5000)
-    }else if(controlsFlag == 'manyou') {
-        const manyouPathX = CalculationX(116.64861023);
-        const manyouPathZ = CalculationZ(39.92165992);
-        camera.position.set(manyouPathX, .18, manyouPathZ);
     }else if(controlsFlag == '3d') {
         camera.position.set(30, 0, 30)
     }
@@ -206,7 +193,7 @@ function initControls() {
         // 控制3D视角角度
         controls.maxPolarAngle = 1.4;
         controls.minPolarAngle = 0.5;
-    }else if(controlsFlag == 'renwu' || controlsFlag == 'manyou') {
+    }else if(controlsFlag == 'renwu') {
         // 第一人称相机控制器
         controls = new THREE.FirstPersonControls(camera, renderer.domElement);
         controls.actualLookSpeed = 300; //相机移动速度
@@ -238,7 +225,7 @@ function initContent() {
             object.position.y = 0;
             object.position.x = 0;
             object.position.z = 0;
-            if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
+            if(controlsFlag == '3d' || controlsFlag == 'renwu') {
                 scene.add(object);
             }else {
                 gltfNum++
@@ -264,7 +251,7 @@ function initContent() {
 /* 地图底图 加载底图图片 PlaneGeometry二维平面*/
 function initBg() {
     var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1);
-    if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
+    if(controlsFlag == '3d' || controlsFlag == 'renwu') {
         var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/SchoolAtlas_a.jpg`);
     }else {
         var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/SchoolAtlas.jpg`);
@@ -811,7 +798,7 @@ function init() {
         loadImg();
     }
     initBg();
-    if(controlsFlag == '3d' || controlsFlag == 'manyou' || controlsFlag == 'renwu') {
+    if(controlsFlag == '3d' || controlsFlag == 'renwu') {
         makeSkybox();
     }
 
@@ -825,10 +812,6 @@ function init() {
     
     /* grid绘制网格 */
     // pathGrid()
-
-    if(controlsFlag == 'manyou') {
-        manyouPath()
-    }
     
     /* 监听事件 */
     window.addEventListener('resize', onWindowResize, false);
@@ -842,20 +825,6 @@ var renderEnabled;
 function animate() {
     // requestAnimationFrame(animate);
     controls.update(clock.getDelta());
-    if(controlsFlag == 'manyou') {
-        // if(progress>1.0){
-        //     return;    //停留在管道末端,否则会一直跑到起点 循环再跑
-        // }
-        // 相机漫游模式
-        if (curve.points.length > 0) {
-            progress += 0.0001;
-            let point = curve.getPointAt(progress);
-            if ( point && point.x ) {
-                camera.position.set(point.x, .18, point.z)
-                // mesh.position.set(point.x,poin2t.y,point.z);
-            }
-        }
-    }
 
     renderer.render(scene, camera);
 
@@ -905,36 +874,6 @@ $.ajax({
 });
 
 /* 以下是地图逻辑 */
-
-/* 全景图展示 */
-if (center) {
-    // 获取全景展示信息
-    // https://ryxy-china.picp.vip/school-map/quanjing/getAll
-    $('.head').show().find('span').html('退出全景');
-    $('.serach').hide();
-    $('.menu').hide();
-    $('.footer').hide();
-    $.ajax({ 
-        // ${process.env.BASE_API}
-        url: `${process.env.BASE_API}school-map/quanjing/getAll`, 
-        success: function(res){
-            console.log('全景图',res)
-            if(res.code == 200) {
-               const provinces = res.data;
-               for (let i = 0; i < provinces.length; i += 1) {
-                   // var markerContent = document.createElement("div");
-                   if(provinces[i].center == center) {
-                        const position =provinces[i].center.split(',');
-                       // console.log(3333, provinces[i].center.split(','))
-                        loadEndImg(position[0], position[1], function() {
-                            window.location.href = './panorama.html?imgurl=' + provinces[i].imgUrl
-                        });
-                   }
-               }
-            }
-        }
-    });
-}
 $('input').on('input', function(e){
     const str = $('input').val();
     if(!str) {
@@ -1332,9 +1271,6 @@ $('.pingmian').click(function () {
 $('.renwu').click(function() {
     window.location.href = './index.html?controlsFlag=renwu';
 })
-$('.manyou').click(function() {
-    window.location.href = './index.html?controlsFlag=manyou';
-})
 /* 获取陀螺仪 */
 // var text = "";  
 window.addEventListener("deviceorientation", orientationHandler, false);  
@@ -1351,9 +1287,4 @@ function orientationHandler(event) {
     // mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
 }
 $('.amap-geo').hide();
-if(controlsFlag == 'manyou') {
-    $('#three').click(function() {
-        controlsFlag = controlsFlag == 'manyou' ? 'manyou2' : 'manyou'     
-    })
-}
 
