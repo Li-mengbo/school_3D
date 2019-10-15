@@ -55,7 +55,7 @@ $('.item').click(function () {
                     if(index == 2) {
                          str = `
                         <div class="small-btn">
-                            <a class="dingwei" href="./index.html?position=${item.center.replace(/ /g, '')}">
+                            <a class="dingwei" href="./index.html?position=${item.center.replace(/ /g, '')}&name=${item.title}">
                                 <img src="${require('../static/img/location.png')}" alt="">
                             </a>
                             <a class="tuji" data-index="${ ind }">
@@ -201,7 +201,7 @@ $(".activity-title").click(function() {
                     if(index == 2) {
                          str = `
                         <div class="small-btn">
-                            <a class="dingwei" href="./index.html?position=${item.center.replace(/ /g, '')}">
+                            <a class="dingwei" href="./index.html?position=${item.center.replace(/ /g, '')}&name=${item.title}">
                                 <img src="${require('../static/img/location.png')}" alt="">
                             </a>
                             <a class="tuji" data-index="${ ind }">

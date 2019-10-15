@@ -48,11 +48,6 @@ const gltfEnd = localStorage.getItem('gltfEnd');
 // 默认为地三人称相机
 let controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
 /* 地图路线绘制 */
-const map = new AMap.Map("mapBox", {
-    viewMode:'3D',
-    zoom: 18,
-    center: [116.64863,39.920623]
-});
 /* 必须有的值
     * scene 场景
     * camera 相机
@@ -83,31 +78,11 @@ const position = GetQueryString('position');
 // 是否缓存
 // const storageDB = localStorage.getItem('storageDB')
 /* 初始坐标在北门 */
-startPathX = CalculationX(116.648592);
-startPathZ = CalculationZ(39.921754);
-// 性能插件
-// let stats = initStats();
+startPathX = 116.648592;
+startPathZ = 39.921754;
 /* 创建场景 */
 function initScene() {
     scene = new THREE.Scene();
-}
-
-/* 性能插件 */
-function initStats() {
-
-    let stats = new Stats();
-
-    // document.body.appendChild(stats.domElement);
-
-    return stats;
-
-}
-
-/* 数据更新 */
-function update() {
-
-    stats.update();
-
 }
 /* 相机 */
 function initCamera() {
@@ -149,9 +124,6 @@ function initRender() {
 /* 灯光 */
 function initLight() {
   let light = 1.2;
-//   if (storageDB) {
-//     light = 0.6;
-//   }
   // 半球光就是渐变的光；
   // 第一个参数是天空的颜色，第二个参数是地上的颜色，第三个参数是光源的强度
   var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, light);
@@ -184,9 +156,6 @@ function initLight() {
 function initControls() {
     if(controlsFlag == 'pingmian') {
         controls = new THREE.OrbitControlsTwo(camera, renderer.domElement);
-        // 控制拖动角度
-        // controls.maxAzimuthAngle = 1.4;
-        // controls.minAzimuthAngle = .5;
     }else if(controlsFlag == '3d') {
         // alert(1)
         controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -304,9 +273,6 @@ function initBg() {
 
 /* 加载天空盒子 */
 function makeSkybox() {
-    // scene.background = new THREE.CubeTextureLoader()
-    // .setPath("https://ryxy-china.picp.vip:8081/skybox/")
-    // .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png', ]);
     //这部分是给出图片的位置及图片名
     var directions  = ["px", "nx", "py", "ny", "pz", "nz"];//获取对象
     //创建一个立方体并且设置大小
@@ -331,193 +297,6 @@ function makeSkybox() {
     //场景当中加入天空盒
     scene.add( sky );
 }
-
-/** 
- * 设置漫游路线 设置地点移动相机
- * 不设置点的话全局漫游
-*/
-function manyouPath(startLon, startLat, endLon,endLat) {
-    curve = new THREE.CatmullRomCurve3();
-    /**
-     * 大门 ——》学生公寓五号楼——》学生中心-》北门
-     * 大门坐标 116.64861023,39.92165992
-     * 学生公寓五号楼 116.64761,39.919361
-     * 学生中心 116.649418,39.919676
-     */
-    const maps = new Graph(arrJson);
-    let pathArr = [];
-    if (!startLon) {
-        // 大门 ——》学生公寓五号楼
-        var startX= Math.round(CalculationX(116.64861023) * 2.5 + 100);
-        var startY= Math.round(CalculationZ(39.92165992) * 2.5 + 100);
-        var endX= Math.round(CalculationX(116.646457) * 2.5 + 100);
-        var endY= Math.round(CalculationZ(39.919402) * 2.5 + 100);
-        var start = maps.grid[startX][startY];
-        var end = maps.grid[endX][endY];
-        const result = astar.search(maps, start, end);
-        result.forEach(items => {
-            let arr = [];
-            // console.log((items.x-100)/ 2.5);
-            // console.log((items.y-100)/ 2.5);
-            arr[0] = (items.x-100) * 0.4;
-            arr[1] = (items.y-100) * 0.4;
-            pathArr.push(arr)
-        }) 
-        // 学生中心——》北门
-        var startX1= Math.round(CalculationX(116.649418) * 2.5 + 100);
-        var startY1= Math.round(CalculationZ(39.919676) * 2.5 + 100);
-        var endX1= Math.round(CalculationX(116.64861023) * 2.5 + 100);
-        var endY1= Math.round(CalculationZ(39.92165992) * 2.5 + 100);
-        var start1 = maps.grid[startX1][startY1];
-        var end1 = maps.grid[endX1][endY1];
-        const result1 = astar.search(maps, start1, end1);
-        result1.forEach(items => {
-            let arr = [];
-            // console.log((items.x-100)/ 2.5);
-            // console.log((items.y-100)/ 2.5);
-            arr[0] = (items.x-100) * 0.4;
-            arr[1] = (items.y-100) * 0.4;
-            pathArr.push(arr)
-        }) 
-    }else {
-        var startX= Math.round(CalculationX(startLon) * 2.5 + 100);
-        var startY= Math.round(CalculationZ(startLat) * 2.5 + 100);
-        var endX= Math.round(CalculationX(endLon) * 2.5 + 100);
-        var endY= Math.round(CalculationZ(endLat) * 2.5 + 100);
-        var start = maps.grid[startX][startY];
-        var end = maps.grid[endX][endY];
-        const result = astar.search(maps, start, end);
-        result.forEach(items => {
-            let arr = [];
-            // console.log((items.x-100)/ 2.5);
-            // console.log((items.y-100)/ 2.5);
-            arr[0] = (items.x-100) * 0.4;
-            arr[1] = (items.y-100) * 0.4;
-            pathArr.push(arr)
-        }) 
-    }
-    pathArr.forEach(item => {
-        // 给空白几何体添加点信息，这里写3个点，geometry会把这些点自动组合成线，面。
-        curve.points.push(new THREE.Vector3(item[0], .2, item[1]));
-    })
-
-    /* 看相机走的路径 */
-    // var tubeGeometry = new THREE.TubeGeometry(curve, 0, 0, 0, false);
-    // var tube = new THREE.Mesh(tubeGeometry);
-    // scene.add(tube)
-
-    /** 
-     * 高德地图导航暂时注释会在物体下有点问题采用A*寻路必须先设置路线
-    */ 
-    /*
-    //步行导航
-    var walking = new AMap.Walking({
-        map: map
-    }); 
-    //根据起终点坐标规划步行路线
-    walking.search([startLon, startLat], [endLon, endLat], function(status, result) {
-        // result即是对应的步行路线数据信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkingResult
-        if (status === 'complete') {
-            const steps = result.routes[0].steps;
-            steps.forEach((item) => {
-                let arr = [];
-                if(item.path) {
-                    item.path.forEach((items) => {
-                        const x = CalculationX(items.lng);
-                        const z = CalculationZ(items.lat);
-                        arr.push([x, z])
-                    })
-                }
-                stepsList.push(arr)
-            });
-            const uuidArr = unid(stepsList);
-            const erweiArr = erwei(uuidArr); 
-            erweiArr.forEach(item => {
-                curve.points.push(new THREE.Vector3(item[0], 0, item[1]))
-            })
-            curve.points.push(new THREE.Vector3(CalculationX(endLon), 0, CalculationZ(endLat)))
-            // 相机管道，更方便直观的看相机走的路线
-            // var tubeGeometry = new THREE.TubeGeometry(curve, 0, 0, 0, false);
-            // var textureLoader = new THREE.TextureLoader();
-            // var texture = textureLoader.load('https://ryxy-china.picp.vip:8081/01.png');
-            // texture.wrapS = THREE.RepeatWrapping
-            // texture.wrapT=THREE.RepeatWrapping
-            // // 设置x方向的偏移(沿着管道路径方向)，y方向默认1
-            // //等价texture.repeat= new THREE.Vector2(20,1)
-            // texture.repeat.x = 20;
-            // var tubeMaterial = new THREE.MeshPhongMaterial({
-            //     map: texture,
-            //     transparent: true,
-            // });
-            // var tube = new THREE.Mesh(tubeGeometry);
-            // scene.add(tube) 
-        } else {
-            console.log('失败')
-        } 
-    });
-    */
-}
-
-/** 
- * 生成网格
- * 可以更直观的看a*寻路，默认生成的网格都是为可以看到可不可以走
-*/
-
-var length = 2000;
-function initGround() {
-	var geometry = new THREE.Geometry();
-	geometry.vertices.push(new THREE.Vector3(-length / 50, 0, 0));
-	geometry.vertices.push(new THREE.Vector3(length / 50, 0, 0));			
-	for(var i = 0; i <= length / 10; i++) {
-		var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-			color: 0x808080,
-			opacity: 1
-		}));
-		line.position.z = (i * 10 / 25) - length / 50;
-        scene.add(line);
-
-		var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-			color: 0x808080,
-			opacity: 1
-		}));
-		line.position.x = (i * 10 / 25) - length / 50;
-		line.rotation.y = 90 * Math.PI / 180;
-        scene.add(line);
-
-	}
-	var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
-	var skyBoxMaterial = new THREE.MeshBasicMaterial({
-		color: 0xFFFFFF,
-		side: THREE.BackSide
-	});
-	var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
-    scene.add(skyBox);
-
-}
-
-/** 
- * 网格的生成是不是可以走
-*/
-
-let clickX1, clickZ1;
-var graph = [];
-function initGrid() {
-    var geometry = new THREE.CubeGeometry( .25,.25,.25);
-    var material = new THREE.MeshBasicMaterial( {color: 0x000cfd} );
-    for(var i=0;i<length/10;i++){
-        var nodeRow = [];
-        graph.push(nodeRow);
-        for(var j=0;j<length/10;j++){
-            nodeRow.push(0);
-            if(arrJson[i][j] == 0) {
-                var cube = new THREE.Mesh( geometry, material );
-                cube.position.set((i-100)*.4,0,(j-100)*.4);
-                scene.add(cube);
-            }
-        }
-    }
-}
-
 
 /* 设置导航路线 */
 function axes(startLon, startLat, endLon,endLat, fn) {
@@ -677,10 +456,6 @@ function loadEndImg(x, z, fn) {
     scene.add(meshEnd);
     document.addEventListener( 'click', onMouseClick.bind(window, fn), false );
 }
-/**
- * 把点击事件放到最外边获取点击的坐标
- */
-// window.addEventListener( 'click', onMouseClick.bind(window, function() {}), false );
 
 /**封装点击事件 */
 /**
@@ -700,48 +475,6 @@ function onMouseClick(fn, event ) {
     //通过鼠标点击的位置计算出raycaster所需要的点的位置，以屏幕中心为原点，值的范围为-1到1.
     mouse.x = (event.clientX/window.innerWidth)*2 -1;
     mouse.y = -(event.clientY/window.innerHeight)*2 + 1;
-
-    /* 点击绘制路线代码 暂时注释 */
-    /*
-    var fxl=new THREE.Vector3(0, .1, 0); 
-    var groundplane=new THREE.Plane(fxl,0);
-    //从相机发射一条射线，经过鼠标点击位置
-    raycaster.setFromCamera(mouse,camera);
-    //计算射线相机到的对象，可能有多个对象，因此返回的是一个数组，按离相机远近排列
-    var ray=raycaster.ray;
-    let intersects = ray.intersectPlane(groundplane);
-    console.log(intersects.x + ' ' + intersects.z)
-    */
-    /**
-     * 点击绘制路线代码先注释 可以配置路线可不可以走
-     */
-    /*
-    clickX1 = intersects.x;
-    clickZ1 = intersects.z;
-    if((clickX2 != clickX1) && (clickZ2 != clickZ1)) {
-        var geometry = new THREE.BoxGeometry(.25, .25, .25);
-        var material = new THREE.MeshBasicMaterial( {color: 0x000cfd} );					
-        var cube = new THREE.Mesh( geometry, material );
-        cube.position.set(Math.round(clickX1/0.4)*0.4,0,Math.round(clickZ1/0.4)*0.4);
-        console.log(Math.round(clickX1*2.5 + 100),Math.round(clickZ1*2.5 + 100))
-        const a = Math.round(clickX1*2.5 + 100);
-        const b = Math.round(clickZ1*2.5 + 100);
-        scene.add(cube);
-        graph[a][b] = 1;
-        clickX2 = clickX1;
-        clickZ2 = clickZ1;
-    } else {
-        var geometry = new THREE.BoxGeometry(.25, .25, .25);
-        var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );					
-        var cube = new THREE.Mesh( geometry, material );
-        cube.position.set(Math.round(clickX1/0.4)*0.4,0,Math.round(clickZ1/0.4)*0.4);
-        console.log(Math.round(clickX1*2.5 + 100),Math.round(clickZ1*2.5 + 100))
-        const a = Math.round(clickX1*2.5 + 100);
-        const b = Math.round(clickZ1*2.5 + 100);
-        scene.add(cube);
-        graph[a][b] = 0;
-    }
-    */
   
     // 通过鼠标点的位置和当前相机的矩阵计算出raycaster
     raycaster.setFromCamera(mouse, camera);
@@ -761,28 +494,6 @@ function onMouseClick(fn, event ) {
     }
 }
 
-/*导出行走的路线 */
-function fakeClick(obj) { 
-　　var ev = document.createEvent("MouseEvents");
-　　　　ev.initMouseEvent("click", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-　　　　obj.dispatchEvent(ev);
-}
-
-function exportRaw(name, data) {
-　　　　var urlObject = window.URL || window.webkitURL || window;
-　　　　var export_blob = new Blob([data]);
-　　　　var save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
-　　　　save_link.href = urlObject.createObjectURL(export_blob);
-　　　　save_link.download = name;
-　　　　fakeClick(save_link);
-}
-/**
- * 网格绘制辅助A*寻路查看路线可不可以走
- */
-function pathGrid () {
-    initGround();
-    initGrid(); 
-}
 
 /* 初始化 */
 function init() {
@@ -810,9 +521,6 @@ function init() {
         },10000)
     }
     
-    /* grid绘制网格 */
-    // pathGrid()
-    
     /* 监听事件 */
     window.addEventListener('resize', onWindowResize, false);
 
@@ -824,13 +532,10 @@ var renderEnabled;
 /* 循环渲染 */
 function animate() {
     // requestAnimationFrame(animate);
-    controls.update(clock.getDelta());
 
     renderer.render(scene, camera);
 
     requestAnimationFrame(animate);
-    // renderer.render(scene, camera);
-    // update();
 }
 
 
@@ -838,12 +543,97 @@ function animate() {
 (function () {
     console.log("three init start...");
 
-    init();
-    animate();
+    // init();
+    // animate();
 
     console.log("three init send...");
 })();
 
+// 导航初始值
+let initCenter = [116.648432,39.92166];
+//导航结束值
+let endPosition = [];
+var imageLayer1 = new AMap.ImageLayer({
+    url: 'http://47.92.118.208:8081/schoolatlas/map01.png',
+    bounds: new AMap.Bounds(
+        [116.643825,39.91907],
+        [116.650799,39.921986]
+    ),
+    zooms: [16, 19]
+});
+var imageLayer2 = new AMap.ImageLayer({
+    url: 'http://47.92.118.208:8081/schoolatlas/map02.png',
+    bounds: new AMap.Bounds(
+        [116.643825,39.91907],
+        [116.650799,39.921986]
+    ),
+    zooms: [16, 19]
+});
+var imageLayer3 = new AMap.ImageLayer({
+    url: 'http://47.92.118.208:8081/schoolatlas/map03.png',
+    bounds: new AMap.Bounds(
+        [116.643825,39.91907],
+        [116.650799,39.921986]
+    ),
+    zooms: [16, 19]
+});
+var imageLayer4 = new AMap.ImageLayer({
+    url: 'http://47.92.118.208:8081/schoolatlas/map04.png',
+    bounds: new AMap.Bounds(
+        [116.643825,39.91907],
+        [116.650799,39.921986]
+    ),
+    zooms: [16, 19]
+});
+var imageLayer5 = new AMap.ImageLayer({
+    url: 'http://47.92.118.208:8081/schoolatlas/map05.png',
+    bounds: new AMap.Bounds(
+        [116.643825,39.91907],
+        [116.650799,39.921986]
+    ),
+    zooms: [16, 19]
+});
+const map = new AMap.Map("mapBox", {
+    viewMode:'3D',
+    resizeEnable: true,
+    rotateEnable: true,
+    pitchEnable: true,
+    pitch: 80,
+    rotation: -15,
+    zoom: 18,
+    zooms:[16,19],
+    showBuildingBlock: true, // 设置地图显示3D楼块效果，移动端也可使用。推荐使用。
+    // showLabel: false,
+    center: [116.64863,39.920623],
+    // mapStyle: 'amap://styles/macaron',
+    // showIndoorMap: false,
+    zoomEnable: true, // 地图是否可缩放
+    forceVector:true,
+    expandZoomRange: true,
+    buildingAnimation:true,//楼块出现是否带动画
+    layers: [
+        new AMap.TileLayer(),
+        imageLayer1,
+        imageLayer2,
+        imageLayer3,
+        imageLayer4,
+        imageLayer5
+    ]
+});
+// 增加控制器
+map.addControl(new AMap.ControlBar({
+    showZoomBar:false,
+    showControlButton:true,
+    position:{
+      right:'70%',
+      top:'40px'
+    }
+  }))
+// 限制显示范围
+// var bounds = map.getBounds();
+// map.setLimitBounds(bounds);
+// 取消楼快
+// map.setFeatures( ['bg', 'road', 'point']);
 /*模糊查询列表 */
 let mapList = [];
 // 获取模糊查询信息
@@ -854,21 +644,6 @@ $.ajax({
         console.log('模糊查询',res)
         if(res.code == 200) {
             mapList = res.data;
-            /* 绘制路可以走的路线终点 */
-            /*
-            mapList.forEach(function(items) {
-                const position =  items.center.split(',');
-                const clickX3 = CalculationX(position[0]);
-                const clickZ3 = CalculationZ(position[1]);
-                var geometry = new THREE.BoxGeometry(.25, .25, .25);
-                var material = new THREE.MeshBasicMaterial( {color: 0xfffd7f} );					
-                var cube = new THREE.Mesh( geometry, material );
-                console.log(clickX3, clickZ3)
-                cube.position.set(Math.round(clickX3/0.4)*0.4,0,Math.round(clickZ3/0.4)*0.4);
-                scene.add(cube);
-            })
-            */
-
         }
     }
 });
@@ -894,31 +669,19 @@ $('input').on('input', function(e){
             $('.panorama').hide();
             const name = $(this).html();
             const position = $(this).attr('data-position').split(',');
-            /**
-             * 再次搜索删除上一个scene也就是删除上个终点
-             */
-            var allChildren = scene.children;
-            if(allChildren.length > 6) {
-                var lastObject = allChildren[allChildren.length-1];
-                if(lastObject instanceof THREE.Mesh){
-                    scene.remove(lastObject);
-                }
-            }
-            /**
-             * 执行加载终点坐标方法绘制点并且导航
-             */
-            loadStartImg(startPathX, startPathZ);
-            loadEndImg(position[0], position[1], function() {
-                $('.serach').hide();
-                axes(startPathX, startPathZ, position[0], position[1], function(result) {
-                    $('.distance').show();
-                    $('.head').show().find('span').html('退出导航');
-                    $('.title').html('');
-                    $('.title').append(`
-                    <span>${name}</span>
-                    <span>${result}.${Math.ceil(Math.random()*10)}米</span>`)
-                })
+            endPosition = position;
+            map.setCenter(position);
+            map.clearMap();
+            const marker = new AMap.Marker({
+                position,
+                offset: new AMap.Pixel(-10, -10),
+                icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+                map: map
             });
+            marker.on('click', function(e) {
+                $('.serach').hide();
+                walk([startPathX, startPathZ,], position, name, false)
+            })
         })
     }else {
         $('.search-list').append('<li>没有查到</li>')
@@ -930,7 +693,6 @@ $('input').on('input', function(e){
 })
 // 搜索模糊查询
 $('.search-btn').click(function() {
-    // exportRaw('test.json', JSON.stringify(graph))
     const str = $('input').val();
     if(!str) {
         $('.search-list').hide().html('')
@@ -950,31 +712,19 @@ $('.search-btn').click(function() {
             $('.panorama').hide();
             const name = $(this).html();
             const position = $(this).attr('data-position').split(',');
-            /**
-             * 再次搜索删除上一个scene也就是删除上个终点
-             */
-            var allChildren = scene.children;
-            if(allChildren.length > 6) {
-                var lastObject = allChildren[allChildren.length-1];
-                if(lastObject instanceof THREE.Mesh){
-                    scene.remove(lastObject);
-                }
-            }
-            /**
-             * 执行加载终点坐标方法绘制点并且导航
-             */
-            loadStartImg(startPathX, startPathZ);
-            loadEndImg(position[0], position[1], function() {
-                $('.serach').hide();
-                axes(startPathX, startPathZ, position[0], position[1], function(result) {
-                    $('.distance').show();
-                    $('.head').show().find('span').html('退出导航');
-                    $('.title').html('');
-                    $('.title').append(`
-                    <span>${name}</span>
-                    <span>${result}.${Math.ceil(Math.random()*10)}米</span>`)
-                })
+            endPosition = position;
+            map.setCenter(position);
+            map.clearMap();
+            const marker = new AMap.Marker({
+                position,
+                offset: new AMap.Pixel(-10, -10),
+                icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+                map: map
             });
+            marker.on('click', function(e) {
+                $('.serach').hide();
+                walk([startPathX, startPathZ], position, name, false)
+            })
         })
     }else {
         $('.search-list').append('<li>没有查到</li>')
@@ -1034,12 +784,18 @@ if (nearby) {
             $('.footer').hide();
             const name = $(this).find('.left-title').html();
             const position = $(this).attr('data-position').split(',');
-            /**
-             * 显示终点坐标
-             */
-            loadEndImg(position[0], position[1], function() {
-                axes(startPathX, startPathZ, position[0], position[1])
+            endPosition = position;
+            map.setCenter(position);
+            const marker = new AMap.Marker({
+                position,
+                offset: new AMap.Pixel(-10, -10),
+                icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+                map: map
             });
+            marker.on('click', function(e) {
+                console.log(position)
+                walk([startPathX, startPathZ], position, name, false)
+            })
         })
     })
     $('.nearby').show();
@@ -1051,13 +807,19 @@ if (position) {
     $('.footer').hide();
     $('.head').show().find('span').html('主页面');
     const positions = position.split(',');
-    /**
-     * 显示终点坐标
-     */
-    loadEndImg(positions[0], positions[1], function() {
-        $('.serach').hide();
-        axes(startPathX, startPathZ, positions[0], positions[1])
+    const name = GetQueryString('name');
+    map.setCenter(positions);
+    map.clearMap();
+    const marker = new AMap.Marker({
+        position: positions,
+        offset: new AMap.Pixel(-10, -10),
+        icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+        map: map
     });
+    marker.on('click', function(e) {
+        console.log(positions)
+        walk([startPathX, startPathZ], positions, name, false)
+    })
 }
 
 // 路线导航 
@@ -1069,9 +831,7 @@ if(startCenter && endCenter) {
     const startCenterArr = startCenter.split(',');
     const endCenterArr = endCenter.split(',');
     // 加载终点和起点坐标 并且画线
-    loadStartImg(CalculationX(startCenterArr[0]), CalculationZ(startCenterArr[1]))
-    loadEndImg(endCenterArr[0], endCenterArr[1])
-    axes(CalculationX(startCenterArr[0]),CalculationZ(startCenterArr[1]), endCenterArr[0], endCenterArr[1])
+    walk(startCenterArr, endCenterArr, '', true, false)
 }
 // 地图定位
 function geolocation () {
@@ -1098,8 +858,8 @@ function geolocation () {
 function onComplete(data) {
     if(data.position) {
         const initPosition = JSON.parse(JSON.stringify(data.position));
-        startPathX = 116.643804 < initPosition.lng && initPosition.lng <116.650751 ? CalculationX(initPosition.lng) : CalculationX(116.648592);
-        startPathZ = 38.921923 < initPosition.lat && initPosition.lat < 40.919047 ? CalculationZ(initPosition.lat) : CalculationZ(39.921754);
+        startPathX = 116.643804 < initPosition.lng && initPosition.lng <116.650751 ? initPosition.lng : 116.648592;
+        startPathZ = 38.921923 < initPosition.lat && initPosition.lat < 40.919047 ? initPosition.lat : 39.921754;
         /*
         var str = [];
         str.push('定位结果：' + data.position);
@@ -1110,28 +870,28 @@ function onComplete(data) {
         str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
         document.getElementById('weizhi').innerHTML =  str.join('<br>') + '您的位置：'+startPathX+',<br/>'+startPathZ +'<br/>' +CalculationX(startPathX)+'<br/>' +CalculationZ(startPathZ);
         */
-        if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
-            mesh.position.x = startPathX;
-            mesh.position.z = startPathZ;
-        }
-        if(controlsFlag == 'renwu') {
-            console.log('=============',startPathX, startPathZ)
-            camera.position.set(startPathX, .18, startPathZ)
-        } 
+        // if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
+        //     mesh.position.x = startPathX;
+        //     mesh.position.z = startPathZ;
+        // }
+        // if(controlsFlag == 'renwu') {
+        //     console.log('=============',startPathX, startPathZ)
+        //     camera.position.set(startPathX, .18, startPathZ)
+        // } 
         $(".amap-geolocation-con").remove()
     }
 }
 //解析定位错误信息
 function onError(data) {
     // alert(JSON.stringify(data))
-    if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
-        // 116.648653,39.921664 116.648592, 39.921754
-        mesh.position.x = CalculationX(116.648592);
-        mesh.position.z = CalculationZ(39.921754);
-    }
-    if(controlsFlag == 'renwu') {
-        camera.position.set(CalculationX(116.648592), .18, CalculationZ(39.921754))
-    } 
+    // if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
+    //     // 116.648653,39.921664 116.648592, 39.921754
+    //     mesh.position.x = CalculationX(116.648592);
+    //     mesh.position.z = CalculationZ(39.921754);
+    // }
+    // if(controlsFlag == 'renwu') {
+    //     camera.position.set(CalculationX(116.648592), .18, CalculationZ(39.921754))
+    // } 
     $(".amap-geolocation-con").remove()
     // console.log(data)
 }
@@ -1244,9 +1004,13 @@ $(".activity-title").click(function() {
                         $(".service-container").hide();
                         $(".container").hide();
                         const endCenterArr = center.split(',');
-                        loadStartImg(CalculationX(startPathX), CalculationZ(startPathZ))
-                        loadEndImg(endCenterArr[0], endCenterArr[1])
-                        axes(startPathX, startPathZ, endCenterArr[0], endCenterArr[1])
+                        new AMap.Marker({
+                            position: endCenterArr,
+                            offset: new AMap.Pixel(-10, -10),
+                            icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+                            map: map
+                        });
+                        walk([startPathX, startPathZ], endCenterArr, name, false)
                     })                        
                     
                 })
@@ -1255,22 +1019,21 @@ $(".activity-title").click(function() {
     });      
 })
 // 导航
-$('.daohang').click(function () {
-    $('.distance').hide()
-    // geolocation();
-    // walk(initCenter, endPosition, name, true, true);
-    geolocation();
-})
-// 视角切换
-$('.3D').click(function () {
-    window.location.href = './index.html?controlsFlag=3d';
-})
-$('.pingmian').click(function () {
-    window.location.href = './index.html?controlsFlag=pingmian';  
-})
-$('.renwu').click(function() {
-    window.location.href = './index.html?controlsFlag=renwu';
-})
+// $('.daohang').click(function () {
+//     $('.distance').hide()
+//     walk([startPathX, startPathZ], endPosition, name, true, true);
+//     // geolocation();
+// })
+// // 视角切换
+// $('.3D').click(function () {
+//     window.location.href = './index.html?controlsFlag=3d';
+// })
+// $('.pingmian').click(function () {
+//     window.location.href = './index.html?controlsFlag=pingmian';  
+// })
+// $('.renwu').click(function() {
+//     window.location.href = './index.html?controlsFlag=renwu';
+// })
 /* 获取陀螺仪 */
 // var text = "";  
 window.addEventListener("deviceorientation", orientationHandler, false);  
@@ -1288,3 +1051,96 @@ function orientationHandler(event) {
 }
 $('.amap-geo').hide();
 
+setInterval(function() {
+    geolocation();
+}, 5000)
+// 绘制步行路线
+/**
+ * start 起点
+ * end 终点必须
+ * name 非必须名字
+ * flag 判断有没有起点或者终点
+ * dingwei 非必须定位导航
+ */
+function walk(start, end, name, flag, dingwei) {
+    // 当前示例的目标是展示如何根据规划结果绘制路线，因此walkOption为空对象
+    var walkingOption = {}
+
+    // 步行导航
+    var walking = new AMap.Walking(walkingOption)
+    if(dingwei) {
+        map.clearMap();
+    }
+    //根据起终点坐标规划步行路线
+    walking.search(start, end, function(status, result) {
+        debugger
+        // result即是对应的步行路线数据信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkingResult
+        if (status === 'complete') {
+            if (result.routes && result.routes.length) {
+                if(flag) {
+                    drawRoute(result.routes[0], true)
+                }else {
+                    $('.distance').show();
+                    $('.head').show().find('span').html('退出导航');
+                    $('.title').html('');
+                    $('.title').append(`
+                    <span>${name}</span>
+                    <span>${result.routes[0].distance}.${Math.ceil(Math.random()*10)}米</span>`)
+                    drawRoute(result.routes[0])
+                }
+                // log.success('绘制步行路线完成')
+            }
+        } else {
+            console.log(result)
+            // log.error('步行路线数据查询失败' + result)
+        } 
+    });
+} 
+function drawRoute(route, flag) {
+    var path = parseRouteToPath(route)
+    if(flag) {
+        var endMarker = new AMap.Marker({
+            position: path[path.length - 1],
+            icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+            map: map
+        })
+    }else {
+        var startMarker = new AMap.Marker({
+            position: path[0],
+            icon: 'https://webapi.amap.com/theme/v1.3/markers/n/start.png',
+            map: map
+        })
+    }
+
+
+    var routeLine = new AMap.Polyline({
+        path: path,
+        zIndex: 10000,
+        isOutline: true,
+        outlineColor: '#ffeeee',
+        borderWeight: 2,
+        strokeWeight: 5,
+        strokeColor: '#0091ff',
+        lineJoin: 'round'
+    })
+
+    routeLine.setMap(map)
+
+    // 调整视野达到最佳显示区域
+    // map.setFitView([ startMarker, endMarker, routeLine ])
+}
+// 解析WalkRoute对象，构造成AMap.Polyline的path参数需要的格式
+// WalkRoute对象的结构文档 https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkRoute
+function parseRouteToPath(route) {
+    var path = []
+    console.log(route)
+    for (var i = 0, l = route.steps.length; i < l; i++) {
+        var step = route.steps[i]
+
+        for (var j = 0, n = step.path.length; j < n; j++) {
+          path.push(step.path[j])
+        }
+    }
+
+    return path
+}
