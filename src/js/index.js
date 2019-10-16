@@ -439,10 +439,11 @@ $('input').on('input', function(e){
                 icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
                 map: map
             });
-            marker.on('click', function(e) {
-                $('.serach').hide();
-                walk([startPathX, startPathZ,], position, name, false)
-            })
+            $('.serach').hide();
+            walk([startPathX, startPathZ,], position, name, false)
+            // marker.on('click', function(e) {
+                
+            // })
         })
     }else {
         $('.search-list').append('<li>没有查到</li>')
@@ -482,10 +483,11 @@ $('.search-btn').click(function() {
                 icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
                 map: map
             });
-            marker.on('click', function(e) {
-                $('.serach').hide();
-                walk([startPathX, startPathZ], position, name, false)
-            })
+            $('.serach').hide();
+            walk([startPathX, startPathZ], position, name, false)
+            // marker.on('click', function(e) {
+                
+            // })
         })
     }else {
         $('.search-list').append('<li>没有查到</li>')
@@ -553,10 +555,11 @@ if (nearby) {
                 icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
                 map: map
             });
-            marker.on('click', function(e) {
-                console.log(position)
-                walk([startPathX, startPathZ], position, name, false)
-            })
+            walk([startPathX, startPathZ], position, name, false)
+            // marker.on('click', function(e) {
+            //     console.log(position)
+            //     walk([startPathX, startPathZ], position, name, false)
+            // })
         })
     })
     $('.nearby').show();
@@ -841,7 +844,6 @@ function walk(start, end, name, flag, dingwei) {
     }
     //根据起终点坐标规划步行路线
     walking.search(start, end, function(status, result) {
-        debugger
         // result即是对应的步行路线数据信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkingResult
         if (status === 'complete') {
             if (result.routes && result.routes.length) {

@@ -25,7 +25,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'caimaodalou',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647319,39.920485), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -43,7 +43,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'guojijiaoliu',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647389,39.920425), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -61,7 +61,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'jiashuloubei',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647389,39.920455), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -88,7 +88,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'kantaidong',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647339,39.920455), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -97,7 +97,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'kantaixi',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647289,39.920475), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -124,8 +124,8 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'shitang',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
-                scale: 70, // 非必须，默认1
+                position: new AMap.LngLat(116.647370,39.920385), // 必须
+                scale: 66, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
             }
@@ -133,7 +133,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'tushuguan',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647359,39.920455), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -142,7 +142,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xuesheng01',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647389,39.920410), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -151,7 +151,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xuesheng02',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647389,39.920410), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -160,7 +160,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xuesheng03',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647389,39.920475), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -169,7 +169,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xuesheng04',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647389,39.920475), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -178,7 +178,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xuesheng05',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647389,39.920415), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -187,7 +187,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'jiashulounan',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647389,39.920455), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -205,7 +205,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xueshengzhongxin',
             paramCity: {
-                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                position: new AMap.LngLat(116.647389,39.920385), // 必须
                 scale: 70, // 非必须，默认1
                 height: 0,  // 非必须，默认0
                 scene: 0, // 非必须，默认0
@@ -353,7 +353,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'caimaodalou',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647319,39.920485), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -371,7 +371,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'guojijiaoliu',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647389,39.920425), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -389,7 +389,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'jiashuloubei',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647389,39.920455), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -416,7 +416,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'kantaidong',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647339,39.920455), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -425,7 +425,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'kantaixi',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647289,39.920475), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -452,8 +452,8 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'shitang',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
-              scale: 70, // 非必须，默认1
+              position: new AMap.LngLat(116.647370,39.920385), // 必须
+              scale: 66, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
             }          
@@ -461,7 +461,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'tushuguan',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647359,39.920455), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -470,7 +470,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xuesheng01',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647389,39.920410), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -479,7 +479,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xuesheng02',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647389,39.920410), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -488,7 +488,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xuesheng03',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647389,39.920475), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -497,7 +497,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xuesheng04',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647389,39.920475), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -506,7 +506,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xuesheng05',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647389,39.920415), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -515,7 +515,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'jiashulounan',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647389,39.920455), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -533,7 +533,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
             name: 'xueshengzhongxin',
             paramCity: {
-              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              position: new AMap.LngLat(116.647389,39.9204385), // 必须
               scale: 70, // 非必须，默认1
               height: 0,  // 非必须，默认0
               scene: 0, // 非必须，默认0
@@ -560,7 +560,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
         {
           name: 'guojijiaoliupang',
           paramCity: {
-            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            position: new AMap.LngLat(116.647389,39.920405), // 必须
             scale: 70, // 非必须，默认1
             height: 0,  // 非必须，默认0
             scene: 0, // 非必须，默认0
