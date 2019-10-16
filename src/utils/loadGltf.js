@@ -1,79 +1,224 @@
 // gltf模型加载
 let gltf;
+
 if(navigator.userAgent.indexOf('iPhone') != -1){
     console.log('iphone')
     gltf = [
         {
-            name: 'bangonglou'
+            name: 'bangonglou',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'beimen'
+            name: 'beimen',
+            paramCity: {
+                position: new AMap.LngLat(116.647827,39.92086), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         },
         {
-            name: 'caimaodalou'
+            name: 'caimaodalou',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'dianjiaoguan'
+            name: 'dianjiaoguan',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         },
         {
-            name: 'guojijiaoliu'
+            name: 'guojijiaoliu',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'jiaoxuelou'
+            name: 'jiaoxuelou',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         },
         {
-            name: 'jiashuloubei'
+            name: 'jiashuloubei',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'xuesheng06'
+            name: 'xuesheng06',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         },
         {
-            name: 'jishuzhongxin'
+            name: 'jishuzhongxin',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'kantaidong'
+            name: 'kantaidong',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         },
         {
-            name: 'kantaixi'
+            name: 'kantaixi',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'menwei'
+            name: 'menwei',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'shibei'
+            name: 'shibei',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         },
         {
-            name: 'shitang'
+            name: 'shitang',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'tushuguan'
+            name: 'tushuguan',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'xuesheng01'
+            name: 'xuesheng01',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         },
         {
-            name: 'xuesheng02'
+            name: 'xuesheng02',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'xuesheng03'
+            name: 'xuesheng03',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         },
         {
-            name: 'xuesheng04'
+            name: 'xuesheng04',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'xuesheng05'
+            name: 'xuesheng05',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         },
         {
-            name: 'jiashulounan'
+            name: 'jiashulounan',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
             name: 'shuiba',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         }, 
         {
-            name: 'xueshengzhongxin'
+            name: 'xueshengzhongxin',
+            paramCity: {
+                position: new AMap.LngLat(116.647389,39.920485), // 必须
+                scale: 70, // 非必须，默认1
+                height: 0,  // 非必须，默认0
+                scene: 0, // 非必须，默认0
+            }
         },
         {
-          name: 'lanqiuchang'
+          name: 'lanqiuchang',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+            }
         },
         // {
         //   name: 'beimenzuo'
@@ -97,13 +242,25 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
       //     name: 'qiaoyi'
       // }, 
       {
-          name: 'shangyuan'
+          name: 'shangyuan',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+        }
       },
     //   {
     //     name: 'shifang'
     //   },
        {
-        name: 'shuita'
+        name: 'shuita',
+        paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+        }
       },
       // {
       //   name: 'weimingming'
@@ -118,158 +275,458 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
       //     name: 'zuoyi'
       //   },
          {
-          name: 'weiqiang01'
+          name: 'weiqiang01',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+            }
         },
         {
-          name: 'weiqiang02'
+          name: 'weiqiang02',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }
         },
         {
-          name: 'weiqiang03'
+          name: 'weiqiang03',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }
         },
         {
-          name: 'weiqiang04'
+          name: 'weiqiang04',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
         },
         {
-          name: 'weiqiang05'
+          name: 'weiqiang05',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
         },
         {
-            name: 'weiqiang06'
+            name: 'weiqiang06',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
           },             
       ]
 }else {
     console.log('安卓')
     gltf = [
         {
-            name: 'bangonglou'
+            name: 'bangonglou',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'beimen'
+            name: 'beimen',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         },
         {
-            name: 'caimaodalou'
+            name: 'caimaodalou',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'dianjiaoguan'
+            name: 'dianjiaoguan',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         },
         {
-            name: 'guojijiaoliu'
+            name: 'guojijiaoliu',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'jiaoxuelou'
+            name: 'jiaoxuelou',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         },
         {
-            name: 'jiashuloubei'
+            name: 'jiashuloubei',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'xuesheng06'
+            name: 'xuesheng06',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         },
         {
-            name: 'jishuzhongxin'
+            name: 'jishuzhongxin',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'kantaidong'
+            name: 'kantaidong',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         },
         {
-            name: 'kantaixi'
+            name: 'kantaixi',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'menwei'
+            name: 'menwei',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'shibei'
+            name: 'shibei',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         },
         {
-            name: 'shitang'
+            name: 'shitang',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'tushuguan'
+            name: 'tushuguan',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'xuesheng01'
+            name: 'xuesheng01',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         },
         {
-            name: 'xuesheng02'
+            name: 'xuesheng02',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'xuesheng03'
+            name: 'xuesheng03',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         },
         {
-            name: 'xuesheng04'
+            name: 'xuesheng04',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'xuesheng05'
+            name: 'xuesheng05',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         },
         {
-            name: 'jiashulounan'
+            name: 'jiashulounan',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
             name: 'shuiba',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         }, 
         {
-            name: 'xueshengzhongxin'
+            name: 'xueshengzhongxin',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
         },
         {
-          name: 'lanqiuchang'
+          name: 'lanqiuchang',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
         },
         {
-          name: 'beimenzuo'
+          name: 'beimenzuo',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
         },
         {
-          name: 'guojijiaoliupang'
+          name: 'guojijiaoliupang',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
         },
         {
-          name: 'lianhuakantai'
+          name: 'lianhuakantai',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
         },
         {
-          name: 'light'
+          name: 'light',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
         },
         {
-          name: 'qiaoer'
+          name: 'qiaoer',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
       },
       {
-          name: 'qiaosan'
+          name: 'qiaosan',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
       }, 
       {
-          name: 'qiaoyi'
+          name: 'qiaoyi',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
       }, 
       {
-          name: 'shangyuan'
+          name: 'shangyuan',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
       },
       {
-        name: 'shifang'
+        name: 'shifang',
+        paramCity: {
+          position: new AMap.LngLat(116.647389,39.920485), // 必须
+          scale: 70, // 非必须，默认1
+          height: 0,  // 非必须，默认0
+          scene: 0, // 非必须，默认0
+        }          
       },
        {
-        name: 'shuita'
+        name: 'shuita',
+        paramCity: {
+          position: new AMap.LngLat(116.647389,39.920485), // 必须
+          scale: 70, // 非必须，默认1
+          height: 0,  // 非必须，默认0
+          scene: 0, // 非必须，默认0
+        }          
       },
       {
-        name: 'weimingming'
+        name: 'weimingming',
+        paramCity: {
+          position: new AMap.LngLat(116.647389,39.920485), // 必须
+          scale: 70, // 非必须，默认1
+          height: 0,  // 非必须，默认0
+          scene: 0, // 非必须，默认0
+        }          
       },
       {
-        name: 'weimingmingpang'
+        name: 'weimingmingpang',
+        paramCity: {
+          position: new AMap.LngLat(116.647389,39.920485), // 必须
+          scale: 70, // 非必须，默认1
+          height: 0,  // 非必须，默认0
+          scene: 0, // 非必须，默认0
+        }          
       },
       {
-        name: 'zuoer'
+        name: 'zuoer',
+        paramCity: {
+          position: new AMap.LngLat(116.647389,39.920485), // 必须
+          scale: 70, // 非必须，默认1
+          height: 0,  // 非必须，默认0
+          scene: 0, // 非必须，默认0
+        }          
       },
       {
-          name: 'zuoyi'
+          name: 'zuoyi',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
       },
       {
-          name: 'weiqiang01'
+          name: 'weiqiang01',
+          paramCity: {
+            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            scale: 70, // 非必须，默认1
+            height: 0,  // 非必须，默认0
+            scene: 0, // 非必须，默认0
+          }          
       },
       {
-            name: 'weiqiang02'
+            name: 'weiqiang02',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
       },
       {
-            name: 'weiqiang03'
+            name: 'weiqiang03',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
       },
       {
-            name: 'weiqiang04'
+            name: 'weiqiang04',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
       },
       {
-            name: 'weiqiang05'
+            name: 'weiqiang05',
+            paramCity: {
+              position: new AMap.LngLat(116.647389,39.920485), // 必须
+              scale: 70, // 非必须，默认1
+              height: 0,  // 非必须，默认0
+              scene: 0, // 非必须，默认0
+            }          
       },
       {
-        name: 'weiqiang06'
+        name: 'weiqiang06',
+        paramCity: {
+          position: new AMap.LngLat(116.647389,39.920485), // 必须
+          scale: 70, // 非必须，默认1
+          height: 0,  // 非必须，默认0
+          scene: 0, // 非必须，默认0
+        }          
       },             
     ]
 }

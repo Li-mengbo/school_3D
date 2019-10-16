@@ -46,8 +46,13 @@ if(navigator.userAgent.indexOf('iPhone') == -1) {
 // 模型是否加载完毕
 const gltfEnd = localStorage.getItem('gltfEnd');
 // 默认为地三人称相机
-let controlsFlag = GetQueryString('controlsFlag') ? GetQueryString('controlsFlag') : 'pingmian';
+let controlsFlag = GetQueryString('controlsFlag') || '';
 /* 地图路线绘制 */
+// const map = new AMap.Map("mapBox", {
+//     viewMode:'3D',
+//     zoom: 18,
+//     center: [116.64863,39.920623]
+// });
 /* 必须有的值
     * scene 场景
     * camera 相机
@@ -93,20 +98,9 @@ function initCamera() {
     * 远端剪切平面可以看到多远
     */
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
-    if(controlsFlag == 'pingmian') {
-        // alert(1)
-        // 默认相机坐标
-        camera.position.set(0, 45, 0)
-    }else if(controlsFlag == 'renwu') {
-        // 修改相机坐标
-        camera.position.set(startPathX, .18, startPathZ);
-        geolocation();
-        setInterval(function() {
-            geolocation(); 
-        },5000)
-    }else if(controlsFlag == '3d') {
-        camera.position.set(30, 0, 30)
-    }
+    // 修改相机坐标
+    camera.position.set(clickX(startPathX), .18, clickZ(startPathZ));
+
 }
 
 /* 渲染器 */
@@ -154,26 +148,16 @@ function initLight() {
 * FirstPersonControls 修改相机为第一人称漫游和人物视角可以用
 */
 function initControls() {
-    if(controlsFlag == 'pingmian') {
-        controls = new THREE.OrbitControlsTwo(camera, renderer.domElement);
-    }else if(controlsFlag == '3d') {
-        // alert(1)
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
-        // 控制3D视角角度
-        controls.maxPolarAngle = 1.4;
-        controls.minPolarAngle = 0.5;
-    }else if(controlsFlag == 'renwu') {
-        // 第一人称相机控制器
-        controls = new THREE.FirstPersonControls(camera, renderer.domElement);
-        controls.actualLookSpeed = 300; //相机移动速度
-        controls.noFly = true;
-        controls.constrainVertical = true; //约束垂直
-        // 控制第一人称上下视角角度
-        controls.verticalMin = 1.0;
-        controls.verticalMax = 2.0;
-        controls.lat = 0; //初始视角进入后y轴的角度
-        controls.lon = 90;
-    }
+    // 第一人称相机控制器
+    controls = new THREE.FirstPersonControls(camera, renderer.domElement);
+    controls.actualLookSpeed = 300; //相机移动速度
+    controls.noFly = true;
+    controls.constrainVertical = true; //约束垂直
+    // 控制第一人称上下视角角度
+    controls.verticalMin = 1.0;
+    controls.verticalMax = 2.0;
+    controls.lat = 0; //初始视角进入后y轴的角度
+    controls.lon = 90;
 }
 // 模型加载个数初始值
 let gltfNum = 0;
@@ -194,7 +178,7 @@ function initContent() {
             object.position.y = 0;
             object.position.x = 0;
             object.position.z = 0;
-            if(controlsFlag == '3d' || controlsFlag == 'renwu') {
+            if(controlsFlag == 'renwu') {
                 scene.add(object);
             }else {
                 gltfNum++
@@ -220,11 +204,7 @@ function initContent() {
 /* 地图底图 加载底图图片 PlaneGeometry二维平面*/
 function initBg() {
     var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1);
-    if(controlsFlag == '3d' || controlsFlag == 'renwu') {
-        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/SchoolAtlas_a.jpg`);
-    }else {
-        var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/SchoolAtlas.jpg`);
-    }
+    var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/Aischool.jpg`);
     var material = new THREE.MeshBasicMaterial({
         map: texture,
         transparent: true
@@ -283,7 +263,6 @@ function makeSkybox() {
     for (var i = 0; i < 6; i++)
         materialArray.push( new THREE.MeshBasicMaterial({
             //这里imagePrefix + directions[i] + imageSuffix 就是将图片路径弄出来
-            // ${process.env.BASE_API}
             map: new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/skybox/${directions[i]}.png`),
             side: THREE.BackSide  //因为这里我们的场景是在天空盒的里面，所以这里设置为背面应用该材质
         }));
@@ -298,80 +277,6 @@ function makeSkybox() {
     scene.add( sky );
 }
 
-/* 设置导航路线 */
-function axes(startLon, startLat, endLon,endLat, fn) {
-    //定义材质THREE.LineBasicMaterial . MeshBasicMaterial...都可以
-    var material = new THREE.LineBasicMaterial({color:0xff6804, linewidth: 5});
-    // 空几何体，里面没有点的信息,不想BoxGeometry已经有一系列点，组成方形了。
-    var geometry = new THREE.Geometry();
-    var maps = new Graph(arrJson);
-
-    var startX= Math.round(startLon * 2.5 + 100);
-    var startY= Math.round(startLat * 2.5 + 100);
-    var endX= Math.round(CalculationX(endLon) * 2.5 + 100);
-    var endY= Math.round(CalculationZ(endLat) * 2.5 + 100);
-    var start = maps.grid[startX][startY];
-    var end = maps.grid[endX][endY];
-
-    /**
-     * 导航起点是否显示
-     */
-    /*
-    var geometry2 = new THREE.BoxGeometry(.25, .25, .25);
-    var material2 = new THREE.MeshBasicMaterial( {color: 0xfff000} );					
-    var cube2 = new THREE.Mesh( geometry2, material2 );
-    cube2.position.set(CalculationX(startLon),0,CalculationZ(startLat));
-    scene.add(cube2);
-
-    var geometry1 = new THREE.BoxGeometry(.25, .25, .25);
-    var material1 = new THREE.MeshBasicMaterial( {color: 0xff0000} );					
-    var cube1 = new THREE.Mesh( geometry1, material1 );
-    cube1.position.set(CalculationX(endLon),0,CalculationZ(endLat));
-    scene.add(cube1);
-    */
-    const result = astar.search(maps, start, end);
-    let pathArr = [];
-    result.forEach(items => {
-        let arr = [];
-        // console.log((items.x-100)/ 2.5);
-        // console.log((items.y-100)/ 2.5);
-        arr[0] = (items.x-100) * 0.4;
-        arr[1] = (items.y-100) * 0.4;
-        pathArr.push(arr)
-    }) 
-    if(result.length==0){
-        alert("无可到达路径");
-        // cleanSphere(); 
-        return;
-    }
-    pathArr.forEach(item => {
-        // 给空白几何体添加点信息，这里写3个点，geometry会把这些点自动组合成线，面。
-        geometry.vertices.push(new THREE.Vector3(item[0], .2, item[1]));
-    })
-    //线构造
-    var line=new THREE.Line(geometry,material);
-    // 加入到场景中
-    scene.add(line); 
-    if (fn) {
-        fn(pathArr.length * 4)
-        // //步行导航
-        // var walking = new AMap.Walking({
-        //     map: map
-        // }); 
-        // //根据起终点坐标规划步行路线
-        // walking.search([startLon, startLat], [endLon, endLat], function(status, result) {
-        //     // result即是对应的步行路线数据信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkingResult
-        //     if (status === 'complete') {
-        //         fn(result)
-        //     } else {
-        //         console.log('失败')
-        //         // log.error('步行路线数据查询失败' + result)
-        //     } 
-        // });
-    }
-
-}
-
 /* 窗口变动触发 */
 function onWindowResize() {
 
@@ -379,121 +284,6 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
-/* 加载导航箭头图片 */
-function loadImg() {
-    /* 中心点坐标轴辅助线 */
-    /*
-    
-    var axes = new THREE.AxisHelper(10);
-    scene.add(axes);
-
-    */
-    // 需要改为定位获取
-    const x = startPathX;
-    const z = startPathZ;
-    console.log(x, z)
-    var skyBoxGeometry = new THREE.PlaneGeometry(1.5, 1.5); 
-    var texture = new THREE.TextureLoader().load(require(`../static/img/ren.png`));
-    var material = new THREE.MeshBasicMaterial({
-            map: texture,
-            transparent: true
-    });
-    mesh = new THREE.Mesh(skyBoxGeometry, material);
-    mesh.position.y = 0.2;
-    mesh.position.x = x;
-    mesh.position.z = z;
-    mesh.rotation.x += -0.5 * Math.PI;
-    mesh.rotation.z += -1 * Math.PI;
-    scene.add(mesh);
-    geolocation();
-    setInterval(function() {
-        geolocation();
-    }, 5000)
-}
-
-/*加载起点图标*/
-function loadStartImg(x, z) {
-    // 需要改为定位获取
-    clickX = x;
-    clickZ = z;
-    var skyBoxGeometry = new THREE.CubeGeometry(); 
-    var texture = new THREE.TextureLoader().load(require(`../static/img/Start.png`));
-    var material = new THREE.MeshBasicMaterial({
-        map: texture,
-        transparent: true
-    });
-    const meshStart = new THREE.Mesh(skyBoxGeometry, material);
-    if(controlsFlag == 'pingmian') {
-        meshStart.position.y = 2.5;
-    } else {
-        meshStart.position.y = 1;
-    }
-    meshStart.position.x = clickX;
-    meshStart.position.z = clickZ;
-    scene.add(meshStart);
-}
-
-/*加载终点图标*/
-function loadEndImg(x, z, fn) {
-    // 需要改为定位获取
-    clickX = CalculationX(x);
-    clickZ = CalculationZ(z);
-    var skyBoxGeometry = new THREE.CubeGeometry(); 
-    var texture = new THREE.TextureLoader().load(require(`../static/img/End1.png`));
-    var material = new THREE.MeshBasicMaterial({
-        map: texture,
-        transparent: true
-    });
-    meshEnd = new THREE.Mesh(skyBoxGeometry, material);
-    if(controlsFlag == 'pingmian') {
-        meshEnd.position.y = 8;
-    } else {
-        meshEnd.position.y = 1;
-    }
-    
-    meshEnd.position.x = clickX;
-    meshEnd.position.z = clickZ;
-    scene.add(meshEnd);
-    document.addEventListener( 'click', onMouseClick.bind(window, fn), false );
-}
-
-/**封装点击事件 */
-/**
- * x 坐标x位置
- * z 坐标z位置
- * fn 点击执行的回调
- * event 点击事件参数
- * clickX2 绘制路线对比参数
- * clickZ2 绘制路线对比参数
- */
-let clickX2 = 0;
-let clickZ2 = 0;
-function onMouseClick(fn, event ) {
-    //声明raycaster和mouse变量
-    var raycaster= new THREE.Raycaster();
-    let mouse = new THREE.Vector2();
-    //通过鼠标点击的位置计算出raycaster所需要的点的位置，以屏幕中心为原点，值的范围为-1到1.
-    mouse.x = (event.clientX/window.innerWidth)*2 -1;
-    mouse.y = -(event.clientY/window.innerHeight)*2 + 1;
-  
-    // 通过鼠标点的位置和当前相机的矩阵计算出raycaster
-    raycaster.setFromCamera(mouse, camera);
-
-    // 获取raycaster直线和所有模型相交的数组集合
-    var intersects = raycaster.intersectObjects(scene.children);
-    console.log(JSON.parse(JSON.stringify(meshEnd)).object, intersects[0])
-    let clickUuid = '';
-    if(intersects[0]) {
-        clickUuid = intersects[0].object.uuid;
-    }
-    const meshEndUuid = JSON.parse(JSON.stringify(meshEnd)).object.uuid;
-    // console.log(clickUuid ==  meshEndUuid)
-    // 判断点击物体uuid是否相等就可以知道是否点击了这个物体
-    if(clickUuid ==  meshEndUuid) {
-        fn();
-    }
-}
-
 
 /* 初始化 */
 function init() {
@@ -505,13 +295,8 @@ function init() {
     initControls();
     //以centerLng所在点tile中心点为中心，加载tile
     // loadMap(tilePos.tileinfo.x, tilePos.tileinfo.y);
-    if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
-        loadImg();
-    }
     initBg();
-    if(controlsFlag == '3d' || controlsFlag == 'renwu') {
-        makeSkybox();
-    }
+    makeSkybox();
 
     if(gltfEnd) {
         initContent();
@@ -532,64 +317,36 @@ var renderEnabled;
 /* 循环渲染 */
 function animate() {
     // requestAnimationFrame(animate);
+    controls.update(clock.getDelta());
 
     renderer.render(scene, camera);
 
     requestAnimationFrame(animate);
+    // renderer.render(scene, camera);
 }
 
 
 /* 初始加载 */
 (function () {
     console.log("three init start...");
-
-    // init();
-    // animate();
-
+    if (controlsFlag == 'renwu') {
+        init();
+        animate();
+        $('#three').show();
+    }
     console.log("three init send...");
 })();
+
 
 // 导航初始值
 let initCenter = [116.648432,39.92166];
 //导航结束值
 let endPosition = [];
-var imageLayer1 = new AMap.ImageLayer({
-    url: 'http://47.92.118.208:8081/schoolatlas/map01.png',
+var imageLayer = new AMap.ImageLayer({
+    url: `${process.env.BASE_API}3dschool/schoolatlas/Aischool.png`,
     bounds: new AMap.Bounds(
-        [116.643825,39.91907],
-        [116.650799,39.921986]
-    ),
-    zooms: [16, 19]
-});
-var imageLayer2 = new AMap.ImageLayer({
-    url: 'http://47.92.118.208:8081/schoolatlas/map02.png',
-    bounds: new AMap.Bounds(
-        [116.643825,39.91907],
-        [116.650799,39.921986]
-    ),
-    zooms: [16, 19]
-});
-var imageLayer3 = new AMap.ImageLayer({
-    url: 'http://47.92.118.208:8081/schoolatlas/map03.png',
-    bounds: new AMap.Bounds(
-        [116.643825,39.91907],
-        [116.650799,39.921986]
-    ),
-    zooms: [16, 19]
-});
-var imageLayer4 = new AMap.ImageLayer({
-    url: 'http://47.92.118.208:8081/schoolatlas/map04.png',
-    bounds: new AMap.Bounds(
-        [116.643825,39.91907],
-        [116.650799,39.921986]
-    ),
-    zooms: [16, 19]
-});
-var imageLayer5 = new AMap.ImageLayer({
-    url: 'http://47.92.118.208:8081/schoolatlas/map05.png',
-    bounds: new AMap.Bounds(
-        [116.643825,39.91907],
-        [116.650799,39.921986]
+        [116.643445,39.918988],
+        [116.651047,39.921962]
     ),
     zooms: [16, 19]
 });
@@ -598,13 +355,13 @@ const map = new AMap.Map("mapBox", {
     resizeEnable: true,
     rotateEnable: true,
     pitchEnable: true,
-    pitch: 80,
-    rotation: -15,
-    zoom: 18,
+    pitch: 40,
+    rotation: 15,
+    zoom: 17,
     zooms:[16,19],
     showBuildingBlock: true, // 设置地图显示3D楼块效果，移动端也可使用。推荐使用。
     // showLabel: false,
-    center: [116.64863,39.920623],
+    center: [116.647643,39.920574],
     // mapStyle: 'amap://styles/macaron',
     // showIndoorMap: false,
     zoomEnable: true, // 地图是否可缩放
@@ -612,28 +369,32 @@ const map = new AMap.Map("mapBox", {
     expandZoomRange: true,
     buildingAnimation:true,//楼块出现是否带动画
     layers: [
+        // 高德默认标准图层
         new AMap.TileLayer(),
-        imageLayer1,
-        imageLayer2,
-        imageLayer3,
-        imageLayer4,
-        imageLayer5
+        imageLayer,
     ]
 });
-// 增加控制器
-map.addControl(new AMap.ControlBar({
-    showZoomBar:false,
-    showControlButton:true,
-    position:{
-      right:'70%',
-      top:'40px'
-    }
-  }))
 // 限制显示范围
 // var bounds = map.getBounds();
 // map.setLimitBounds(bounds);
 // 取消楼快
-// map.setFeatures( ['bg', 'road', 'point']);
+map.setFeatures( ['bg', 'road', 'point']);
+// 创建Object3DLayer图层
+var object3Dlayer = new AMap.Object3DLayer();
+map.add(object3Dlayer);
+console.log(loadGltf)
+map.plugin(["AMap.GltfLoader"], function () {
+    var gltfObj = new AMap.GltfLoader();
+    loadGltf.forEach(item => {
+        gltfObj.load(`${process.env.BASE_API}3dschool/School/${item.name}/${item.name}.gltf`, function (gltfCity) {
+            gltfCity.setOption(item.paramCity);
+            gltfCity.rotateX(-90);
+            gltfCity.rotateY(-180);
+            gltfCity.rotateZ(-180);
+            object3Dlayer.add(gltfCity);
+        });
+    })
+});
 /*模糊查询列表 */
 let mapList = [];
 // 获取模糊查询信息
@@ -1025,15 +786,23 @@ $(".activity-title").click(function() {
 //     // geolocation();
 // })
 // // 视角切换
-// $('.3D').click(function () {
-//     window.location.href = './index.html?controlsFlag=3d';
-// })
-// $('.pingmian').click(function () {
-//     window.location.href = './index.html?controlsFlag=pingmian';  
-// })
-// $('.renwu').click(function() {
-//     window.location.href = './index.html?controlsFlag=renwu';
-// })
+$('.3D').click(function () {
+    if (controlsFlag === 'renwu') {
+        window.location.href = './index.html';
+    }
+    map.setPitch(40);
+    map.setRotation(15);
+})
+$('.pingmian').click(function () {
+    if (controlsFlag === 'renwu') {
+        window.location.href = './index.html';
+    }
+    map.setPitch(0);
+    map.setRotation(0);
+})
+$('.renwu').click(function() {
+    window.location.href = './index.html?controlsFlag=renwu';
+})
 /* 获取陀螺仪 */
 // var text = "";  
 window.addEventListener("deviceorientation", orientationHandler, false);  
@@ -1044,16 +813,16 @@ function orientationHandler(event) {
     // text += "前后旋转：rotate beta{" + Math.round(event.beta) + "deg)<br>";  
     // text += "扭转设备：rotate gamma{" + Math.round(event.gamma) + "deg)<br>";  
     // arrow.innerHTML = text;  
-    if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
-        mesh.rotation.z = (event.alpha - 135)/180*Math.PI;
-    }
+    // if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
+    //     mesh.rotation.z = (event.alpha - 135)/180*Math.PI;
+    // }
     // mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
 }
 $('.amap-geo').hide();
 
-setInterval(function() {
-    geolocation();
-}, 5000)
+// setInterval(function() {
+//     geolocation();
+// }, 5000)
 // 绘制步行路线
 /**
  * start 起点
@@ -1065,7 +834,6 @@ setInterval(function() {
 function walk(start, end, name, flag, dingwei) {
     // 当前示例的目标是展示如何根据规划结果绘制路线，因此walkOption为空对象
     var walkingOption = {}
-
     // 步行导航
     var walking = new AMap.Walking(walkingOption)
     if(dingwei) {
