@@ -99,7 +99,7 @@ function initCamera() {
     */
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
     // 修改相机坐标
-    camera.position.set(clickX(startPathX), .18, clickZ(startPathZ));
+    camera.position.set(CalculationX(startPathX), .18, CalculationZ(startPathZ));
 
 }
 
@@ -204,7 +204,7 @@ function initContent() {
 /* 地图底图 加载底图图片 PlaneGeometry二维平面*/
 function initBg() {
     var skyBoxGeometry2 = new THREE.PlaneGeometry(164, 164, 1);
-    var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/Aischool.jpg`);
+    var texture = new THREE.TextureLoader().load(`${process.env.BASE_API}3dschool/schoolatlas/Aischool.png`);
     var material = new THREE.MeshBasicMaterial({
         map: texture,
         transparent: true
@@ -788,20 +788,20 @@ $(".activity-title").click(function() {
 //     walk([startPathX, startPathZ], endPosition, name, true, true);
 //     // geolocation();
 // })
-// // 视角切换
+// 视角切换
 $('.3D').click(function () {
-    if (controlsFlag === 'renwu') {
-        window.location.href = './index.html';
-    }
     map.setPitch(40);
     map.setRotation(15);
-})
-$('.pingmian').click(function () {
     if (controlsFlag === 'renwu') {
         window.location.href = './index.html';
     }
+})
+if (controlsFlag == 'pingmian') {
     map.setPitch(0);
     map.setRotation(0);
+}
+$('.pingmian').click(function () {
+    window.location.href = './index.html?controlsFlag=pingmian';
 })
 $('.renwu').click(function() {
     window.location.href = './index.html?controlsFlag=renwu';
@@ -835,6 +835,7 @@ $('.amap-geo').hide();
  * dingwei 非必须定位导航
  */
 function walk(start, end, name, flag, dingwei) {
+    debugger
     // 当前示例的目标是展示如何根据规划结果绘制路线，因此walkOption为空对象
     var walkingOption = {}
     // 步行导航
