@@ -42,6 +42,7 @@ if(navigator.userAgent.indexOf('iPhone') == -1) {
 }
 /* 全景图展示 */
 const center = GetQueryString('center');
+const id = GetQueryString('id');
 if (center) {
   // 获取全景展示信息
   // https://ryxy-china.picp.vip/school-map/quanjing/getAll
@@ -85,3 +86,10 @@ if (center) {
       }
   });
 }
+$('.return').click(function() {
+  if(id) {
+    window.location.href = `./panoramaContainer.html?id=${id}`
+  } else {
+    window.location.href = `./panoramaContainer.html`
+  }
+})

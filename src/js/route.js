@@ -63,7 +63,7 @@ $.ajax({
                     var length =  $(this).parent('.activity').find('.open-title').length + 1 || 1;
                     $(this).parent('.activity').animate({
                         height: length * .9 + 'rem', 
-                    },1000)
+                    },500)
                     $(this).parent('.activity').attr('data-flag', 'flase')
                     // $(this).parent('.activity').siblings('.activity').hide();
                     // $(this).siblings('.activity').animate({
@@ -73,7 +73,7 @@ $.ajax({
                 }else {
                     $(this).parent('.activity').animate({
                         height: '.8rem', 
-                    },1000)
+                    },500)
                     $(this).parent('.activity').attr('data-flag', 'true')
                     // $('.activity').show()
                     // $(this).siblings('.activity').attr('data-flag', 'false')
@@ -93,7 +93,7 @@ $.ajax({
                           $(that).parent('.open').prev('input').val(name);
                           $(that).parents('.activity').animate({
                             height: '.8rem',
-                          }, 1000)
+                          }, 500)
                           $(that).parents('.activity').attr('data-flag', 'true')
                         }
                     }
@@ -107,7 +107,7 @@ $('.start').on('input', function(e){
     if(!str) {
         $(this).parent('.activity').animate({
             height: '.8rem',
-        }, 1000)
+        }, 500)
         return
     };
     $(this).next('.open').html('');
@@ -123,7 +123,7 @@ $('.start').on('input', function(e){
         var length =  $(this).parent('.activity').find('.open-title').length + 1 || 1;
         $(this).parent('.activity').animate({
             height: length * .9 + 'rem', 
-        },1000)
+        },500)
         $(this).parent('.activity').attr('data-flag', 'flase')
         $('.open-title').click(function () {
             const name = $(this).html();
@@ -139,7 +139,7 @@ $('.start').on('input', function(e){
                       $(that).parent('.open').prev('input').val(name);
                       $(that).parents('.activity').animate({
                         height: '.8rem',
-                      }, 1000)
+                      }, 500)
                       $(that).parents('.activity').attr('data-flag', 'true')
                     }
                 }
@@ -152,7 +152,7 @@ $('.end').on('input', function(e){
     if(!str) {
         $(this).parent('.activity').animate({
             height: '.8rem',
-        }, 1000)
+        }, 500)
         return
     };
     $(this).next('.open').html('');
@@ -168,7 +168,7 @@ $('.end').on('input', function(e){
         var length =  $(this).parent('.activity').find('.open-title').length + 1 || 1;
         $(this).parent('.activity').animate({
             height: length * .9 + 'rem', 
-        },1000)
+        },500)
         $(this).parent('.activity').attr('data-flag', 'flase')
         $('.open-title').click(function () {
             const name = $(this).html();
@@ -184,7 +184,7 @@ $('.end').on('input', function(e){
                       $(that).parent('.open').prev('input').val(name);
                       $(that).parents('.activity').animate({
                         height: '.8rem',
-                      }, 1000)
+                      }, 500)
                       $(that).parents('.activity').attr('data-flag', 'true')
                     }
                 }

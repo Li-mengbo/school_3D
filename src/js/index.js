@@ -783,11 +783,11 @@ $(".activity-title").click(function() {
     });      
 })
 // 导航
-// $('.daohang').click(function () {
-//     $('.distance').hide()
-//     walk([startPathX, startPathZ], endPosition, name, true, true);
-//     // geolocation();
-// })
+$('.daohang').click(function () {
+    $('.distance').hide()
+    // walk([startPathX, startPathZ], endPosition, name, true, true);
+    // geolocation();
+})
 // 视角切换
 $('.3D').click(function () {
     map.setPitch(40);
@@ -835,7 +835,6 @@ $('.amap-geo').hide();
  * dingwei 非必须定位导航
  */
 function walk(start, end, name, flag, dingwei) {
-    debugger
     // 当前示例的目标是展示如何根据规划结果绘制路线，因此walkOption为空对象
     var walkingOption = {}
     // 步行导航
