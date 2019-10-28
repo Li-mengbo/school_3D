@@ -256,9 +256,15 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
       // {
       //     name: 'qiaosan'
       // }, 
-      // {
-      //     name: 'qiaoyi'
-      // }, 
+      {
+        name: 'qiaoyi',
+        paramCity: {
+          position: new AMap.LngLat(116.647349,39.920535), // 必须
+          scale: 70, // 非必须，默认1
+          height: 0,  // 非必须，默认0
+          scene: 0, // 非必须，默认0
+        }          
+      }, 
       {
           name: 'shangyuan',
           paramCity: {
@@ -653,7 +659,7 @@ if(navigator.userAgent.indexOf('iPhone') != -1){
       {
           name: 'qiaoyi',
           paramCity: {
-            position: new AMap.LngLat(116.647389,39.920485), // 必须
+            position: new AMap.LngLat(116.647349,39.920535), // 必须
             scale: 70, // 非必须，默认1
             height: 0,  // 非必须，默认0
             scene: 0, // 非必须，默认0
