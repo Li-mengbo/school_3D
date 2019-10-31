@@ -65,88 +65,104 @@ $('.play').click(function () {
 const videoList = [
     {
         name: "学校北门",
-        video: `${process.env.BASE_API}3dschool/mv/学校北门.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/学校北门_batch.mp4`
     },
     {
         name: "电教馆",
-        video: `${process.env.BASE_API}3dschool/mv/电教馆.mp4`
-    },
-    {
-        name: "6号学生公寓",
-        video: `${process.env.BASE_API}3dschool/mv/6号学生公寓.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/电教馆_batch.mp4`
     },
     {
         name: "体育场",
-        video: `${process.env.BASE_API}3dschool/mv/体育场.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/体育场_batch.mp4`
     },
     {
         name: "中心食堂",
-        video: `${process.env.BASE_API}3dschool/mv/5号公寓和中心食堂.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/中心食堂_batch.mp4`
     },
     {
         name: "会议楼",
-        video: `${process.env.BASE_API}3dschool/mv/会议楼.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/会议楼_batch.mp4`
     },
     {
         name: "教学楼",
-        video: `${process.env.BASE_API}3dschool/mv/教学楼.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/教学楼_batch.mp4`
     },
     {
         name: "1号学生公寓",
-        video:`${process.env.BASE_API}3dschool/mv/1号和2号公寓.mp4`
+        video:`${process.env.BASE_API}3dschool/mv/1号学生公寓_batch.mp4`
     },
     {
         name: "2号学生公寓",
-        video: `${process.env.BASE_API}3dschool/mv/1号和2号公寓.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/2号学生公寓_batch.mp4`
     },
     {
         name: "3号学生公寓",
-        video: `${process.env.BASE_API}3dschool/mv/3号和4号公寓.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/3号学生公寓_batch.mp4`
     },
     {
         name: "4号学生公寓",
-        video: `${process.env.BASE_API}3dschool/mv/3号和4号公寓.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/4号学生公寓_batch.mp4`
+    },
+    {
+        name: "5号学生公寓",
+        video: `${process.env.BASE_API}3dschool/mv/5号学生公寓_batch.mp4`
+    },
+    {
+        name: "六号学生公寓",
+        video: `${process.env.BASE_API}3dschool/mv/六号学生公寓_batch.mp4`
     },
     {
         name: "学生中心",
-        video: `${process.env.BASE_API}3dschool/mv/学生中心.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/学生中心_batch.mp4`
     },
     {
         name: "国际教育学院",
-        video: `${process.env.BASE_API}3dschool/mv/国际教育学院.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/国际教育学院_batch.mp4`
     },
     {
         name: "文化广场",
-        video: `${process.env.BASE_API}3dschool/mv/文化广场.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/文化广场_batch.mp4`
     },
     {
         name: "运河微缩景观（西）",
-        video: `${process.env.BASE_API}3dschool/mv/运河微缩景观（西）.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/运河微缩景观（西）_batch.mp4`
     },
     {
         name: "运河微缩景观（东）",
-        video: `${process.env.BASE_API}3dschool/mv/运河微缩景观（东）.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/运河微缩景观（东）_batch.mp4`
     },
     {
         name: "两岸水吧",
-        video: `${process.env.BASE_API}3dschool/mv/两岸水吧.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/两岸水吧_batch.mp4`
     },
     {
         name: "办公楼",
-        video: `${process.env.BASE_API}3dschool/mv/办公楼.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/办公楼_batch.mp4`
     },
     {
         name: "商苑",
-        video: `${process.env.BASE_API}3dschool/mv/商苑.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/商苑_batch.mp4`
     },
     {
         name: "篮球场",
-        video: `${process.env.BASE_API}3dschool/mv/篮球场.mp4`
+        video: `${process.env.BASE_API}3dschool/mv/篮球场_batch.mp4`
     },
     {
         name: "潘序伦铜像",
-        video: `${process.env.BASE_API}3dschool/mv/图书馆和潘序伦铜像.mp4`
-    }
+        video: `${process.env.BASE_API}3dschool/mv/潘序伦铜像_batch.mp4`
+    },
+    {
+        name: "财贸大楼",
+        video: `${process.env.BASE_API}3dschool/mv/财贸大楼_batch.mp4`
+    },
+    {
+        name: "家属区北宿舍楼",
+        video: `${process.env.BASE_API}3dschool/mv/家属区北宿舍楼_batch.mp4`
+    },
+    {
+        name: "图书馆",
+        video: `${process.env.BASE_API}3dschool/mv/图书馆_batch.mp4`
+    },
 ]
 videoList.forEach(item => {
     $('.video-list').append(
