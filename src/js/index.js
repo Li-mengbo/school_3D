@@ -440,7 +440,7 @@ $('input').on('input', function(e){
                 map: map
             });
             $('.serach').hide();
-            walk([startPathX, startPathZ,], position, name, false)
+            walk([startPathX, startPathZ], position, name, false)
             // marker.on('click', function(e) {
                 
             // })
@@ -595,6 +595,11 @@ if(startCenter && endCenter) {
     const startCenterArr = startCenter.split(',');
     const endCenterArr = endCenter.split(',');
     // 加载终点和起点坐标 并且画线
+    var startMarker = new AMap.Marker({
+        position: startCenterArr,
+        icon: 'https://webapi.amap.com/theme/v1.3/markers/n/start.png',
+        map: map
+    })
     walk(startCenterArr, endCenterArr, '', true, false)
 }
 // 地图定位
