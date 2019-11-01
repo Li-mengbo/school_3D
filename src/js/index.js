@@ -405,6 +405,16 @@ $.ajax({
         console.log('模糊查询',res)
         if(res.code == 200) {
             mapList = res.data;
+            res.data.forEach((item) => {
+                new AMap.Marker({
+                    position: item.center.split(','),
+                    offset: new AMap.Pixel(-50, -10),
+                    map: map,
+                    content: '<div class="custom-content-marker" style="width: 100px;color: #fff;text-align: center;">' +
+                    '   <div class="close-btn">' + item.name + '</div>' +
+                    '</div>'
+                });
+            })
         }
     }
 });
@@ -797,9 +807,9 @@ $('.daohang').click(function () {
 $('.3D').click(function () {
     map.setPitch(40);
     map.setRotation(15);
-    if (controlsFlag === 'renwu') {
+    // if (controlsFlag === 'renwu') {
         window.location.href = './index.html';
-    }
+    // }
 })
 if (controlsFlag == 'pingmian') {
     map.setPitch(0);
@@ -887,7 +897,6 @@ function drawRoute(route, flag) {
         })
     }
 
-
     var routeLine = new AMap.Polyline({
         path: path,
         zIndex: 10000,
@@ -919,3 +928,32 @@ function parseRouteToPath(route) {
 
     return path
 }
+// 添加建筑标注
+// var layer = new AMap.LabelsLayer({
+//     zooms: [16, 19],
+//     zIndex: 1000,
+//     // 开启标注避让，默认为开启，v1.4.15 新增属性
+//     collision: true,
+//     // 开启标注淡入动画，默认为开启，v1.4.15 新增属性
+//     animation: true,
+// });
+
+// map.add(layer);
+
+// var markers = [];
+
+// for (var i = 0; i < LabelsData.length; i++) {
+//     var curData = LabelsData[i];
+//     curData.extData = {
+//         index: i
+//     };
+
+//     var labelMarker = new AMap.LabelMarker(curData);
+
+//     markers.push(labelMarker);
+
+//     layer.add(labelMarker);
+// }
+
+// map.setFitView();
+var positions = [["116.648575","39.921054"], [116.648471,39.920627]]
