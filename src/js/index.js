@@ -559,12 +559,23 @@ if (nearby) {
             const position = $(this).attr('data-position').split(',');
             endPosition = position;
             map.setCenter(position);
-            const marker = new AMap.Marker({
-                position,
-                offset: new AMap.Pixel(-10, -10),
-                icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
-                map: map
-            });
+            console.log(position[0] ===  "116.646301" && position[1] === "39.921176")
+            if (position[0] ===  "116.646301" && position[1] === "39.921176") {
+                const marker = new AMap.Marker({
+                    position: [116.646119,39.9216],
+                    offset: new AMap.Pixel(-10, -10),
+                    icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+                    map: map
+                });
+            } else {
+                const marker = new AMap.Marker({
+                    position,
+                    offset: new AMap.Pixel(-10, -10),
+                    icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+                    map: map
+                });
+            }
+
             walk([startPathX, startPathZ], position, name, false)
             // marker.on('click', function(e) {
             //     console.log(position)
