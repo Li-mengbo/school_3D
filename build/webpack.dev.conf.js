@@ -9,9 +9,7 @@ module.exports = merge(baseConfig, {
     open: true,
     compress: true,
     port: 8882,
-    // host: '192.168.12.36'
-    // host: '192.168.1.66'
-    host: '192.168.2.226'
+    host: '192.168.1.66'
   },
   module:{
     rules: [
