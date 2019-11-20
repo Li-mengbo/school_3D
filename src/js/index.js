@@ -5,6 +5,7 @@ import loadGltf from '../utils/loadGltf';
 import $ from 'jquery';
 import arrJson from '../utils/test.json';
 console.log(process.env.BASE_API)
+var vConsole = new VConsole();
 if(navigator.userAgent.indexOf('iPhone') == -1) {
     //防止页面后退
     var XBack = {};
@@ -48,17 +49,11 @@ const gltfEnd = localStorage.getItem('gltfEnd');
 // 默认为地三人称相机
 let controlsFlag = GetQueryString('controlsFlag') || '';
 /* 地图路线绘制 */
-// const map = new AMap.Map("mapBox", {
-//     viewMode:'3D',
-//     zoom: 18,
-//     center: [116.64863,39.920623]
-// });
 /* 必须有的值
     * scene 场景
     * camera 相机
     * renderer 渲染器 
     * controls 控制器
-    * mesh 箭头相当于一个人的指示
     * meshEnd 终点坐标
     * curve路线的绘制
     * progress 漫游相机速度
@@ -80,6 +75,7 @@ const nearby = GetQueryString('nearby');
 const startCenter = GetQueryString('startCenter');
 const endCenter = GetQueryString('endCenter');
 const position = GetQueryString('position');
+let startPosition = [];
 // 是否缓存
 // const storageDB = localStorage.getItem('storageDB')
 /* 初始坐标在北门 */
@@ -382,6 +378,16 @@ map.setFeatures( ['bg', 'road', 'point']);
 // 创建Object3DLayer图层
 var object3Dlayer = new AMap.Object3DLayer();
 map.add(object3Dlayer);
+// 人的位置
+const people  = new AMap.Marker({
+    position: new AMap.LngLat(startPathX, startPathZ),
+    content: `<div class="custom-content-marker" style="width: 13px; height: 13px;">
+                <img style="width: 13px;height: 13px;position: absolute;left: 0;top: 0;" src="${process.env.BASE_API}3dschool/img/ren.png">
+            </div>`,
+    map: map,
+    offset: new AMap.Pixel(0, 0),
+    angle: 145
+})
 console.log(loadGltf)
 map.plugin(["AMap.GltfLoader"], function () {
     var gltfObj = new AMap.GltfLoader();
@@ -442,7 +448,7 @@ $('input').on('input', function(e){
             const position = $(this).attr('data-position').split(',');
             endPosition = position;
             map.setCenter(position);
-            map.clearMap();
+            // map.clearMap();
             const marker = new AMap.Marker({
                 position,
                 offset: new AMap.Pixel(-10, -10),
@@ -450,10 +456,9 @@ $('input').on('input', function(e){
                 map: map
             });
             $('.serach').hide();
+            console.log('起点', startPathX, startPathZ)
+            startPosition = [startPathX, startPathZ]
             walk([startPathX, startPathZ], position, name, false)
-            // marker.on('click', function(e) {
-                
-            // })
         })
     }else {
         $('.search-list').append('<li>没有查到</li>')
@@ -486,7 +491,7 @@ $('.search-btn').click(function() {
             const position = $(this).attr('data-position').split(',');
             endPosition = position;
             map.setCenter(position);
-            map.clearMap();
+            // map.clearMap();
             const marker = new AMap.Marker({
                 position,
                 offset: new AMap.Pixel(-10, -10),
@@ -583,7 +588,7 @@ if (position) {
     const positions = position.split(',');
     const name = GetQueryString('name');
     map.setCenter(positions);
-    map.clearMap();
+    // map.clearMap();
     const marker = new AMap.Marker({
         position: positions,
         offset: new AMap.Pixel(-10, -10),
@@ -617,16 +622,16 @@ function geolocation () {
     map.plugin('AMap.Geolocation', function () {
         var geolocation = new AMap.Geolocation({
             enableHighAccuracy: true,//是否使用高精度定位，默认:true
-            timeout: 100000,          //超过10秒后停止定位，默认：无穷大
+            timeout: 100000,        //超过10秒后停止定位，默认：无穷大
+            noIpLocate: 1,          // 移动端不使用ip定位
             maximumAge: 0,           //定位结果缓存0毫秒，默认：0
             convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
-            showButton: true,        //显示定位按钮，默认：true
-            buttonPosition: 'LB',    //定位按钮停靠位置，默认：'LB'，左下角
-            buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
-            showMarker: true,        //定位成功后在定位到的位置显示点标记，默认：true
-            showCircle: true,        //定位成功后用圆圈表示定位精度范围，默认：true
-            panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
-            zoomToAccuracy:true      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+            showButton: false,        //显示定位按钮，默认：true
+            showMarker: false,        //定位成功后在定位到的位置显示点标记，默认：true
+            showCircle: false,        //定位成功后用圆圈表示定位精度范围，默认：true
+            panToLocation: false,     //定位成功后将定位到的位置作为地图中心点，默认：true
+            zoomToAccuracy:false,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+            useNative: true            // 首先使用sdK定位
         });
         map.addControl(geolocation);
         geolocation.getCurrentPosition();
@@ -639,6 +644,10 @@ function onComplete(data) {
         const initPosition = JSON.parse(JSON.stringify(data.position));
         startPathX = 116.643804 < initPosition.lng && initPosition.lng <116.650751 ? initPosition.lng : 116.648592;
         startPathZ = 38.921923 < initPosition.lat && initPosition.lat < 40.919047 ? initPosition.lat : 39.921754;
+        console.log(startPathX, startPathZ)
+        if(startPathX === 116.648592 && startPathZ === 39.921754) {
+            return false
+        }
         /*
         var str = [];
         str.push('定位结果：' + data.position);
@@ -649,15 +658,13 @@ function onComplete(data) {
         str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
         document.getElementById('weizhi').innerHTML =  str.join('<br>') + '您的位置：'+startPathX+',<br/>'+startPathZ +'<br/>' +CalculationX(startPathX)+'<br/>' +CalculationZ(startPathZ);
         */
-        // if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
-        //     mesh.position.x = startPathX;
-        //     mesh.position.z = startPathZ;
-        // }
-        // if(controlsFlag == 'renwu') {
-        //     console.log('=============',startPathX, startPathZ)
-        //     camera.position.set(startPathX, .18, startPathZ)
-        // } 
-        $(".amap-geolocation-con").remove()
+        if(controlsFlag !== 'renwu') {
+            people.setPosition([startPathX, startPathZ])
+            people.setAngle(-45)
+        } else {
+            camera.position.set(CalculationX(startPathX), .18, CalculationZ(startPathZ))
+        }
+        
     }
 }
 //解析定位错误信息
@@ -671,13 +678,12 @@ function onError(data) {
     // if(controlsFlag == 'renwu') {
     //     camera.position.set(CalculationX(116.648592), .18, CalculationZ(39.921754))
     // } 
-    $(".amap-geolocation-con").remove()
     // console.log(data)
 }
 $(".service").click(function(){
     $(".service-container").show();
     $(".container").show();
-    map.clearMap();
+    // map.clearMap();
 });
 $(".service-container").click(function() {
     $(this).hide();
@@ -831,16 +837,21 @@ function orientationHandler(event) {
     // text += "前后旋转：rotate beta{" + Math.round(event.beta) + "deg)<br>";  
     // text += "扭转设备：rotate gamma{" + Math.round(event.gamma) + "deg)<br>";  
     // arrow.innerHTML = text;  
-    // if(controlsFlag == 'pingmian' || controlsFlag == '3d') {
-    //     mesh.rotation.z = (event.alpha - 135)/180*Math.PI;
-    // }
-    // mesh.rotation.z = Math.round(event.alpha + 90) * 6 / 360;
+    if(controlsFlag !== 'renwu') {
+        // people.setAngle(event.alpha-45)
+        // console.log(event.alpha)
+        // mesh.rotation.z = (event.alpha - 135)/180*Math.PI;
+        // camera.rotation.y = Math.round(event.alpha + 90) * 6 / 360
+    }
 }
 $('.amap-geo').hide();
 
-// setInterval(function() {
-//     geolocation();
-// }, 5000)
+setInterval(function() {
+    geolocation();
+    if(startPosition.length > 0) {
+        walk(startPosition, [startPathX, startPathZ], '', false, null, true)
+    }
+}, 3000)
 // 绘制步行路线
 /**
  * start 起点
@@ -849,13 +860,13 @@ $('.amap-geo').hide();
  * flag 判断有没有起点或者终点
  * dingwei 非必须定位导航
  */
-function walk(start, end, name, flag, dingwei) {
+function walk(start, end, name, flag, dingwei, passedPolyline) {
     // 当前示例的目标是展示如何根据规划结果绘制路线，因此walkOption为空对象
     var walkingOption = {}
     // 步行导航
     var walking = new AMap.Walking(walkingOption)
     if(dingwei) {
-        map.clearMap();
+        // map.clearMap();
     }
     //根据起终点坐标规划步行路线
     walking.search(start, end, function(status, result) {
@@ -864,6 +875,8 @@ function walk(start, end, name, flag, dingwei) {
             if (result.routes && result.routes.length) {
                 if(flag) {
                     drawRoute(result.routes[0], true)
+                }else if(passedPolyline){
+                    drawRoute(result.routes[0], null, passedPolyline)
                 }else {
                     $('.distance').show();
                     $('.head').show().find('span').html('退出导航');
@@ -881,34 +894,40 @@ function walk(start, end, name, flag, dingwei) {
         } 
     });
 } 
-function drawRoute(route, flag) {
+function drawRoute(route, flag, passedPolyline) {
     var path = parseRouteToPath(route)
-    if(flag) {
-        var endMarker = new AMap.Marker({
-            position: path[path.length - 1],
-            icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
-            map: map
+    if(!passedPolyline) {
+        if(flag) {
+            var endMarker = new AMap.Marker({
+                position: path[path.length - 1],
+                icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+                map: map
+            })
+        }else {
+            var startMarker = new AMap.Marker({
+                position: path[0],
+                icon: 'https://webapi.amap.com/theme/v1.3/markers/n/start.png',
+                map: map
+            })
+        }
+        new AMap.Polyline({
+            map: map,
+            path: path,
+            showDir: true,
+            strokeWeight: 5,
+            strokeColor: '#28F',
+            // lineJoin: 'round'
         })
-    }else {
-        var startMarker = new AMap.Marker({
-            position: path[0],
-            icon: 'https://webapi.amap.com/theme/v1.3/markers/n/start.png',
-            map: map
+    } else {
+        new AMap.Polyline({
+            map: map,
+            path: path,
+            strokeWeight: 5,
+            strokeColor: '#AF5',
+            // lineJoin: 'round'
         })
     }
-
-    var routeLine = new AMap.Polyline({
-        path: path,
-        zIndex: 10000,
-        isOutline: true,
-        outlineColor: '#ffeeee',
-        borderWeight: 2,
-        strokeWeight: 5,
-        strokeColor: '#0091ff',
-        lineJoin: 'round'
-    })
-
-    routeLine.setMap(map)
+    // routeLine.setMap(map)
 
     // 调整视野达到最佳显示区域
     // map.setFitView([ startMarker, endMarker, routeLine ])
@@ -917,7 +936,6 @@ function drawRoute(route, flag) {
 // WalkRoute对象的结构文档 https://lbs.amap.com/api/javascript-api/reference/route-search#m_WalkRoute
 function parseRouteToPath(route) {
     var path = []
-    console.log(route)
     for (var i = 0, l = route.steps.length; i < l; i++) {
         var step = route.steps[i]
 
@@ -928,32 +946,3 @@ function parseRouteToPath(route) {
 
     return path
 }
-// 添加建筑标注
-// var layer = new AMap.LabelsLayer({
-//     zooms: [16, 19],
-//     zIndex: 1000,
-//     // 开启标注避让，默认为开启，v1.4.15 新增属性
-//     collision: true,
-//     // 开启标注淡入动画，默认为开启，v1.4.15 新增属性
-//     animation: true,
-// });
-
-// map.add(layer);
-
-// var markers = [];
-
-// for (var i = 0; i < LabelsData.length; i++) {
-//     var curData = LabelsData[i];
-//     curData.extData = {
-//         index: i
-//     };
-
-//     var labelMarker = new AMap.LabelMarker(curData);
-
-//     markers.push(labelMarker);
-
-//     layer.add(labelMarker);
-// }
-
-// map.setFitView();
-var positions = [["116.648575","39.921054"], [116.648471,39.920627]]
